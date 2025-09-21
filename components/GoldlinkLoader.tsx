@@ -103,6 +103,65 @@ export default function GoldlinkLoader({ onLoadComplete }: GoldlinkLoaderProps) 
 
           return v;
         }
+      })(),
+      
+      variableRings: (function() {
+        var v = {x: 0, y: 0, z: 0};
+        
+        return function(i, n, maxRadius) {
+          maxRadius = maxRadius || 200;
+          
+          // Create only 2 ring layers
+          var ringIndex = Math.floor(i / (n / 2)); // 2 rings
+          var particleInRing = i % Math.floor(n / 2);
+          var particlesPerRing = Math.floor(n / 2);
+          
+          // Base ring radii (only 2 rings)
+          var baseRadii = [120, 180]; // Inner and outer ring
+          var baseRadius = baseRadii[ringIndex] || 180;
+          
+          // Angle around the ring
+          var angle = (particleInRing / particlesPerRing) * Math.PI * 2;
+          
+          // Rotate inner ring relative to outer ring  
+          var rotationOffset = ringIndex * Math.PI * 0.6; // Inner ring rotated
+          angle += rotationOffset;
+          
+          // Create gaps/breaks in the rings
+          var gapSize = Math.PI * 0.3; // Size of gaps
+          var gapPositions = [Math.PI * 0.2, Math.PI * 1.4]; // 2 gap positions
+          var inGap = false;
+          for (var g = 0; g < gapPositions.length; g++) {
+            var gapStart = gapPositions[g];
+            var gapEnd = gapStart + gapSize;
+            if (angle % (Math.PI * 2) > gapStart && angle % (Math.PI * 2) < gapEnd) {
+              inGap = true;
+              break;
+            }
+          }
+          
+          // If in gap, push particle much further out (effectively hide it)
+          var gapMultiplier = inGap ? 3 : 1;
+          
+          // Variable thickness: use multiple sine waves for organic variation
+          var thickness1 = Math.sin(angle * 3) * 0.4;      // 3 main variations
+          var thickness2 = Math.sin(angle * 7) * 0.2;      // 7 smaller bumps
+          var thickness3 = Math.sin(angle * 11) * 0.1;     // 11 tiny variations
+          var thicknessVariation = thickness1 + thickness2 + thickness3;
+          
+          // Apply thickness variation and gap multiplier
+          var actualRadius = baseRadius * (1 + thicknessVariation) * gapMultiplier;
+          
+          // Less height variation, keep rings more planar
+          var heightVariation = Math.sin(angle * 2) * 10;
+          
+          // Calculate position
+          v.x = Math.cos(angle) * actualRadius;
+          v.z = Math.sin(angle) * actualRadius;
+          v.y = heightVariation + ringIndex * 15; // Less vertical spread
+          
+          return v;
+        }
       })()
     };
 
@@ -203,8 +262,8 @@ export default function GoldlinkLoader({ onLoadComplete }: GoldlinkLoaderProps) 
           aAnimation.array[i2 + v + 1] = duration;
         }
 
-        // end position
-        var point = utils.fibSpherePoint(i, faceCount, 200);
+        // end position - use variable thickness rings instead of sphere
+        var point = utils.variableRings(i, faceCount, 200);
 
         for (v = 0; v < 9; v += 3) {
           aEndPosition.array[i3 + v] = point.x;
