@@ -772,7 +772,20 @@ body {
 
 .message-bubble { max-width: 75%; padding: 0.5rem 1rem; border-radius: 1rem; }
 .message-incoming { background-color: #374151; align-self: flex-start; border-bottom-left-radius: 0.25rem; }
-.message-outgoing { background-color: #1e3a8a; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
+.message-outgoing { 
+  background: linear-gradient(145deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
+  color: #0a0a0a;
+  font-weight: 600;
+  align-self: flex-end; 
+  border-bottom-right-radius: 0.25rem;
+  box-shadow: 
+    0 0 15px rgba(251,191,36,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    0 4px 8px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  border: 1px solid rgba(217,119,6,0.6);
+  position: relative;
+}
 
 /* ===== Calendar modal ===== */
 #calendar-modal .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }

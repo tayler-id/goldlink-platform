@@ -9,9 +9,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" })
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Goldlink - Premium Therapy Experience",
+  description: "Professional therapy video chat platform with interactive tools, secure messaging, and premium user experience",
+  generator: "Next.js",
 }
 
 export default function RootLayout({
