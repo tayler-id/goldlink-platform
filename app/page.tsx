@@ -44,20 +44,32 @@ const renderSubDialMarks = (): React.ReactElement[] =>
 
 // ---------- Data for the CPT Code Book ----------
 const CPT_CODES = [
-  { code: "90791", description: "Psychiatric Diagnostic Evaluation" },
-  { code: "90832", description: "Psychotherapy, 30 minutes" },
-  { code: "90834", description: "Psychotherapy, 45 minutes" },
-  { code: "90837", description: "Psychotherapy, 60 minutes" },
-  { code: "90847", description: "Family Psychotherapy" },
-  { code: "90853", description: "Group Psychotherapy" },
-  { code: "99203", description: "Office/outpatient visit, new, 30-44 mins" },
-  { code: "99204", description: "Office/outpatient visit, new, 45-59 mins" },
-  { code: "99213", description: "Office/outpatient visit, est., 20-29 mins" },
-  { code: "99214", description: "Office/outpatient visit, est., 30-39 mins" },
-  { code: "90839", description: "Psychotherapy for crisis; first 60 minutes" },
-  { code: "90840", description: "Psychotherapy for crisis; each addl 30 mins" },
+  { code: "90791", description: "Psychiatric Diagnostic Evaluation", category: "Evaluation" },
+  { code: "90792", description: "Psychiatric Diagnostic Evaluation with Medical Services", category: "Evaluation" },
+  { code: "90834", description: "Psychotherapy, 45 minutes", category: "Individual Therapy" },
+  { code: "90837", description: "Psychotherapy, 60 minutes", category: "Individual Therapy" },
+  { code: "90834+90833", description: "Psychotherapy, 45 min + add-on", category: "Individual Therapy" },
+  { code: "90837+90833", description: "Psychotherapy, 60 min + add-on", category: "Individual Therapy" },
+  { code: "90847", description: "Family Psychotherapy (with patient present)", category: "Family Therapy" },
+  { code: "90846", description: "Family Psychotherapy (without patient present)", category: "Family Therapy" },
+  { code: "90853", description: "Group Psychotherapy (other than multifamily)", category: "Group Therapy" },
+  { code: "90849", description: "Multiple-family group psychotherapy", category: "Group Therapy" },
+  { code: "90834+99354", description: "Psychotherapy 45 min + prolonged service", category: "Extended Services" },
+  { code: "90837+99354", description: "Psychotherapy 60 min + prolonged service", category: "Extended Services" },
+  { code: "90839", description: "Psychotherapy for crisis; first 60 minutes", category: "Crisis Intervention" },
+  { code: "90840", description: "Psychotherapy for crisis; each additional 30 minutes", category: "Crisis Intervention" },
+  { code: "96116", description: "Neurobehavioral status exam", category: "Testing" },
+  { code: "96121", description: "Neurobehavioral status exam with physician", category: "Testing" },
+  { code: "99202", description: "Office/outpatient visit, new patient, 15-29 minutes", category: "Office Visits" },
+  { code: "99203", description: "Office/outpatient visit, new patient, 30-44 minutes", category: "Office Visits" },
+  { code: "99204", description: "Office/outpatient visit, new patient, 45-59 minutes", category: "Office Visits" },
+  { code: "99205", description: "Office/outpatient visit, new patient, 60-74 minutes", category: "Office Visits" },
+  { code: "99212", description: "Office/outpatient visit, established patient, 10-19 minutes", category: "Office Visits" },
+  { code: "99213", description: "Office/outpatient visit, established patient, 20-29 minutes", category: "Office Visits" },
+  { code: "99214", description: "Office/outpatient visit, established patient, 30-39 minutes", category: "Office Visits" },
+  { code: "99215", description: "Office/outpatient visit, established patient, 40-54 minutes", category: "Office Visits" },
 ];
-const CODES_PER_PAGE = 6;
+const CODES_PER_PAGE = 4; // Reduced for better page layout
 const TOTAL_CPT_PAGES = Math.ceil(CPT_CODES.length / CODES_PER_PAGE);
 
 // Heights used to keep content above the absolute footer
@@ -201,46 +213,117 @@ useEffect(() => {
   const createBookPages = () => {
     const pages: React.ReactElement[] = [];
 
+    // Front Cover - Thick hardcover with embossed styling
     pages.push(
-      <div key="cover" className="w-full h-full bg-black flex items-center justify-center border border-gold relative">
-        <div className="text-center space-y-8 flex flex-col justify-center h-full">
-          <h1 className="font-orbitron text-4xl font-bold text-gold tracking-wider">CPT CODES</h1>
-          <div className="w-24 h-0.5 bg-gold mx-auto" />
-          <p className="font-orbitron text-lg text-gold tracking-wide">Reference Manual</p>
-          <div className="mt-8">
-            <p className="text-sm text-gold/70 font-light tracking-wide">Click to open</p>
+      <div key="front-cover" className="book-page book-cover-front">
+        <div className="cover-content">
+          <div className="cover-spine"></div>
+          <div className="cover-main">
+            <div className="cover-inner">
+              <h1 className="cover-title">CPT CODES</h1>
+              <div className="cover-divider"></div>
+              <p className="cover-subtitle">Reference Manual</p>
+              <div className="cover-logo">
+                <div className="logo-emboss">⚕</div>
+              </div>
+              <p className="cover-hint">Click to open</p>
+            </div>
+            <div className="cover-binding"></div>
           </div>
         </div>
       </div>
     );
 
-    for (let i = 0; i < CPT_CODES.length; i += CODES_PER_PAGE) {
-      const pageCodes = CPT_CODES.slice(i, i + CODES_PER_PAGE);
-      const pageNumber = Math.floor(i / CODES_PER_PAGE) + 1;
-
-      pages.push(
-        <div key={`page-${pageNumber}`} className="w-full h-full bg-[#fdf6e3] p-3 box-border">
-          <h3 className="font-orbitron text-sm font-bold text-[#8b5a2b] mb-3">
-            CPT Codes - Page {pageNumber}
-          </h3>
-          <div className="space-y-2">
-            {pageCodes.map((item, index) => (
-              <div key={index} className="pb-1 mb-1 border-b border-[#c8b7a1]">
-                <p className="font-bold font-orbitron text-sm text-[#8b5a2b]">{item.code}</p>
-                <p className="text-xs ml-2 text-[#584422] leading-tight">{item.description}</p>
-              </div>
-            ))}
+    // Table of Contents page
+    pages.push(
+      <div key="toc" className="book-page book-page-right">
+        <div className="page-content">
+          <h2 className="page-title">Table of Contents</h2>
+          <div className="toc-list">
+            <div className="toc-item">
+              <span className="toc-category">Evaluation Services</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">3</span>
+            </div>
+            <div className="toc-item">
+              <span className="toc-category">Individual Therapy</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">4</span>
+            </div>
+            <div className="toc-item">
+              <span className="toc-category">Family Therapy</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">5</span>
+            </div>
+            <div className="toc-item">
+              <span className="toc-category">Group Therapy</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">6</span>
+            </div>
+            <div className="toc-item">
+              <span className="toc-category">Crisis Intervention</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">7</span>
+            </div>
+            <div className="toc-item">
+              <span className="toc-category">Office Visits</span>
+              <span className="toc-dots"></span>
+              <span className="toc-page">8</span>
+            </div>
           </div>
         </div>
-      );
-    }
+        <div className="page-number">2</div>
+      </div>
+    );
 
+    // Content pages grouped by category
+    const categorizedCodes = CPT_CODES.reduce((acc: any, code) => {
+      if (!acc[code.category]) acc[code.category] = [];
+      acc[code.category].push(code);
+      return acc;
+    }, {});
+
+    let pageNum = 3;
+    Object.entries(categorizedCodes).forEach(([category, codes]: [string, any]) => {
+      pages.push(
+        <div key={`category-${category}`} className="book-page book-page-left">
+          <div className="page-content">
+            <h2 className="page-title">{category}</h2>
+            <div className="codes-grid">
+              {(codes as any[]).map((item, index) => (
+                <div key={index} className="code-entry">
+                  <div className="code-number">{item.code}</div>
+                  <div className="code-description">{item.description}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="page-number">{pageNum}</div>
+        </div>
+      );
+      pageNum++;
+    });
+
+    // Back Cover
     pages.push(
-      <div key="back-cover" className="w-full h-full bg-black flex items-center justify-center border border-gold">
-        <div className="text-center space-y-6 flex flex-col justify-center h-full">
-          <h2 className="font-orbitron text-2xl font-bold text-gold tracking-wide">End of Manual</h2>
-          <div className="w-16 h-0.5 bg-gold mx-auto" />
-          <p className="text-sm text-gold/70 tracking-wide">Total Codes: {CPT_CODES.length}</p>
+      <div key="back-cover" className="book-page book-cover-back">
+        <div className="cover-content">
+          <div className="cover-main back-cover-main">
+            <div className="cover-inner">
+              <h2 className="back-cover-title">Professional Reference</h2>
+              <div className="back-cover-stats">
+                <div className="stat-item">
+                  <span className="stat-number">{CPT_CODES.length}</span>
+                  <span className="stat-label">CPT Codes</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">{Object.keys(categorizedCodes).length}</span>
+                  <span className="stat-label">Categories</span>
+                </div>
+              </div>
+              <div className="back-cover-logo">⚕</div>
+            </div>
+          </div>
         </div>
       </div>
     );

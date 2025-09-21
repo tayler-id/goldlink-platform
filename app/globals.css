@@ -2,6 +2,347 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* ===== Hardcover Book Styling ===== */
+.book-page {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+/* Front Cover Styling - Thick Hardcover */
+.book-cover-front {
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #000000 100%);
+  box-shadow: 
+    inset -8px 0 15px rgba(0,0,0,0.8),
+    inset 0 0 30px rgba(251,191,36,0.1),
+    0 0 20px rgba(0,0,0,0.9),
+    15px 15px 40px rgba(0,0,0,0.8);
+  border: 3px solid #333;
+  position: relative;
+}
+
+.book-cover-front::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(251,191,36,0.05) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 0%, rgba(251,191,36,0.02) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+.cover-content {
+  height: 100%;
+  display: flex;
+  position: relative;
+}
+
+.cover-spine {
+  width: 20px;
+  background: linear-gradient(to right, #000 0%, #222 50%, #111 100%);
+  box-shadow: inset -3px 0 8px rgba(0,0,0,0.8);
+  border-right: 2px solid #333;
+}
+
+.cover-main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.cover-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+}
+
+.cover-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #FBBF24;
+  letter-spacing: 0.2em;
+  text-shadow: 
+    0 0 10px rgba(251,191,36,0.8),
+    0 2px 0 #B45309,
+    0 4px 0 #92400E,
+    0 6px 10px rgba(0,0,0,0.8),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  filter: drop-shadow(0 0 15px rgba(251,191,36,0.6));
+  position: relative;
+  z-index: 2;
+}
+
+.cover-title::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(45deg, 
+    rgba(251,191,36,0.1) 0%, 
+    rgba(251,191,36,0.05) 50%, 
+    rgba(251,191,36,0.1) 100%);
+  border-radius: 8px;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.cover-divider {
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #FBBF24 20%, 
+    #FCD34D 50%, 
+    #FBBF24 80%, 
+    transparent 100%);
+  margin: 20px 0;
+  box-shadow: 0 0 10px rgba(251,191,36,0.8);
+  position: relative;
+}
+
+.cover-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #FBBF24;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(251,191,36,1);
+}
+
+.cover-subtitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  color: #FBBF24;
+  letter-spacing: 0.3em;
+  font-weight: 300;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  margin-bottom: 30px;
+}
+
+.cover-logo {
+  margin: 30px 0;
+}
+
+.logo-emboss {
+  font-size: 3rem;
+  color: #FBBF24;
+  text-shadow: 
+    0 0 20px rgba(251,191,36,0.8),
+    0 4px 0 #B45309,
+    0 8px 15px rgba(0,0,0,0.9);
+  filter: drop-shadow(0 0 20px rgba(251,191,36,0.6));
+}
+
+.cover-hint {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  color: rgba(251,191,36,0.7);
+  letter-spacing: 0.2em;
+  margin-top: auto;
+  animation: pulse 2s infinite;
+}
+
+.cover-binding {
+  height: 100%;
+  width: 8px;
+  background: linear-gradient(to bottom, #333 0%, #111 50%, #333 100%);
+  border-left: 1px solid #555;
+  border-right: 1px solid #000;
+}
+
+/* Page Content Styling */
+.book-page-right, .book-page-left {
+  background: #fdfcf8;
+  box-shadow: 
+    inset 0 0 15px rgba(139,90,43,0.1),
+    0 2px 10px rgba(0,0,0,0.1);
+  border: 1px solid #e6ddd4;
+}
+
+.book-page-left {
+  border-right: 3px solid #ddd;
+}
+
+.book-page-right {
+  border-left: 3px solid #ddd;
+}
+
+.page-content {
+  padding: 30px;
+  height: calc(100% - 40px);
+  overflow: hidden;
+}
+
+.page-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #8b5a2b;
+  border-bottom: 2px solid #FBBF24;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.toc-list {
+  space-y: 15px;
+}
+
+.toc-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  font-family: 'Orbitron', monospace;
+}
+
+.toc-category {
+  font-weight: 600;
+  color: #8b5a2b;
+  font-size: 0.9rem;
+}
+
+.toc-dots {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(to right, #8b5a2b 0, #8b5a2b 4px, transparent 4px, transparent 8px);
+  margin: 0 15px;
+}
+
+.toc-page {
+  font-weight: bold;
+  color: #FBBF24;
+  background: #8b5a2b;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.codes-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.code-entry {
+  border-left: 4px solid #FBBF24;
+  padding: 12px;
+  background: rgba(251,191,36,0.05);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 0 2px 4px rgba(139,90,43,0.1);
+}
+
+.code-number {
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #8b5a2b;
+  margin-bottom: 5px;
+}
+
+.code-description {
+  font-size: 0.9rem;
+  color: #584422;
+  line-height: 1.4;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #8b5a2b;
+  background: #FBBF24;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+/* Back Cover Styling */
+.book-cover-back {
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #000000 100%);
+  box-shadow: 
+    inset 8px 0 15px rgba(0,0,0,0.8),
+    inset 0 0 30px rgba(251,191,36,0.1),
+    0 0 20px rgba(0,0,0,0.9),
+    -15px 15px 40px rgba(0,0,0,0.8);
+  border: 3px solid #333;
+}
+
+.back-cover-main {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.back-cover-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #FBBF24;
+  letter-spacing: 0.2em;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.back-cover-stats {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #FBBF24;
+  text-shadow: 0 0 10px rgba(251,191,36,0.8);
+}
+
+.stat-label {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  color: rgba(251,191,36,0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 5px;
+}
+
+.back-cover-logo {
+  font-size: 2rem;
+  color: #FBBF24;
+  text-shadow: 0 0 15px rgba(251,191,36,0.8);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* Variant for dark mode class */
 @custom-variant dark (&:is(.dark *));
 
