@@ -758,7 +758,7 @@ useEffect(() => {
             X
           </button>
           <div className="stopwatch-body frosted-glass">
-            <div className="stopwatch-face">
+            <div className={`stopwatch-face ${timerIsRunning ? 'running' : ''}`}>
               <svg viewBox="0 0 200 200">
                 <g>{renderDialMarks()}</g>
                 <circle cx="100" cy="60" r="25" fill="rgba(31, 41, 55, 0.5)" stroke="#9ca3af" strokeWidth="1" />
@@ -779,10 +779,34 @@ useEffect(() => {
           <button
             id="start-stop-crown"
             className={timerIsRunning ? "running" : ""}
+            onMouseDown={(e) => {
+              console.log('Crown pressed');
+              e.currentTarget.classList.add('pressed');
+            }}
+            onMouseUp={(e) => {
+              console.log('Crown released');
+              e.currentTarget.classList.remove('pressed');
+            }}
+            onMouseLeave={(e) => {
+              console.log('Crown mouse leave');
+              e.currentTarget.classList.remove('pressed');
+            }}
             onClick={() => setTimerIsRunning(!timerIsRunning)}
           />
           <button
             id="reset-button"
+            onMouseDown={(e) => {
+              console.log('Side button pressed');
+              e.currentTarget.classList.add('pressed');
+            }}
+            onMouseUp={(e) => {
+              console.log('Side button released');
+              e.currentTarget.classList.remove('pressed');
+            }}
+            onMouseLeave={(e) => {
+              console.log('Side button mouse leave');
+              e.currentTarget.classList.remove('pressed');
+            }}
             onClick={() => {
               setTimerIsRunning(false);
               setElapsedTime(0);
