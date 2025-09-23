@@ -1,0 +1,40 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card" *ngIf="isLoaded && gleresponsetype>0" id="lastErrorElement">
+        <div class="card-header">
+          <i class="icon-magnifier icons font-2xl d-block mt-4" style="display: inline !important;top:2px;position:relative;font-size:16px !important;opacity:0.6;"></i>  <strong>Asset Error(s)</strong>
+          <small></small>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <strong style="font-size:11px;color:red;" [hidden]="gleresponsetype!=2">Could not retrieve a meaningful error.</strong>
+              <strong style="font-size:11px;color:green;" [hidden]="gleresponsetype!=3"><i class="fa fa-check"></i> No error(s) were found!</strong>
+              <div style="font-size:11px;" [hidden]="gleresponsetype!=4"> 
+                <p><strong>The last error was retrieved: </strong></p>
+                <p><i>Message:</i> {{errorresponse}}</p>
+                <p [hidden]="errortype.length==0"><i>Type:</i> {{errortype}} 
+                  <span *ngIf="errortype.includes('SERVER_ERROR')"><i style="font-size:11px;"> -the plaid/institution server had a problem, retry in a few hours; if the problem persists, get the client to reauthorize</i></span>
+                  <span *ngIf="errortype.includes('LOGIN_REQUIRED')"><i style="font-size:11px;"> -the client did not fully authorize, or changed their banking credentials after the initial request</i></span>
+                </p>
+                <p [hidden]="errorurl.length==0" style="width:fit-content;"><i tooltip="View any pertinent documentation/details (in new window)">Details</i>: <a href="javascript:void(0);" (click)="gotoDocumentationURL()">Link</a></p>
+              </div>
+            </div>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer">
+          <button type="reset" class="btn btn-sm btn-link" (click)="gotoView()"><i class="fa fa-angle-double-left "> Back</i> </button>
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div>
+</div>

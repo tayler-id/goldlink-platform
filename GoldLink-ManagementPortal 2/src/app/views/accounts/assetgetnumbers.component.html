@@ -1,0 +1,63 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <i class="cil-book icons font-2xl d-block mt-4" style="display: inline !important;top:2px;position:relative;font-size:16px !important;opacity:0.6;"></i>  <strong>Account Numbers</strong>
+          <div class="card-header-actions">
+            <button type="button" class="btn btn-block btn-link" style="color:#20a8d8;background-color:white;" (click)="numbersRefresh()" tooltip="Click to attempt to refresh account numbers" style="width:fit-content;font-size:11px;display:inline-block;">Refresh<i class='cil-reload c-icon c-icon-3xl c-icon-fix'></i></button>
+            &nbsp;
+            <!--<small><button type="button" class="btn btn-block btn-link" (click)="gotoEdit()" title="Click to edit client details" style="position:absolute;top:7.7px;left:125px;width:fit-content;font-size:11px;">edit<i class='cil-color-border c-icon c-icon-3xl c-icon-fix'></i></button></small>-->
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <strong style="font-size:11px;color:red;" [hidden]="responsetype!=2">No related account number was stored or useable, so no numbers found.</strong>
+              <strong style="font-size:11px;" [hidden]="responsetype!=3">No related account numbers were stored for that account.</strong>
+
+              <div class="row" style="justify-content: center;" *ngIf="ganrefreshresponsetype==1" style="margin-bottom:12px;">
+                <small><i class="fa fa-refresh fa-lg fa-spin" style="color:rgb(0, 132, 255);"></i></small>
+                <strong style="font-size:11px;margin-left:5px;">Please wait.. an asset request was sent and could take up to a whole minute</strong>
+              </div>
+              <div class="row" style="justify-content: center;" *ngIf="ganrefreshresponsetype==2 || ganrefreshresponsetype==4" style="margin-bottom:12px;">
+                <small><i style="color:rgb(0, 132, 255);"> </i></small>
+                <strong style="font-size:11px;margin-left:13px;">Error was given, or refresh failed, <a [routerLink]="['/accounts/asseterrors/']" (click)="gotoGetLastError()"><i>check for an error?</i></a> </strong>
+              </div>
+              <div class="row" style="justify-content: center;" *ngIf="ganrefreshresponsetype==3" style="margin-bottom:12px;">
+                <small><i style="color:rgb(0, 132, 255);"></i></small>
+                <strong style="font-size:11px;margin-left:13px;">Refreshed successfully.</strong>
+              </div>
+
+              <div style="font-size:11px;"> 
+                <div *ngFor="let data of numbers" id="AcntNumbers{{data.id}}">
+                  <strong style="font-size:11px;">Listing relevent numbers for account of type {{data.strtype}}.</strong><br/>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.account">Account Number: <b>{{data.account}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.routing">Routing Number: <b>{{data.routing}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.wire_routing">Wire Routing Number: <b>{{data.wire_routing}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.institution">Institution Code: <b>{{data.institution}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.branch">Branch Code: <b>{{data.branch}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.iban">IBAN: <b>{{data.iban}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.bic">BIC: <b>{{data.bic}}</b></p>
+                  <p style="margin-top:10px; margin-bottom:0px" [hidden]="!data.sort_code">Sorting Code: <b>{{data.sort_code}}</b></p>
+                  <hr/>
+                </div>
+              </div>
+            </div>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer">
+          <button type="reset" class="btn btn-sm btn-link" (click)="gotoView()"><i class="fa fa-angle-double-left "> Back</i> </button>
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<style>
+  @media (max-width: 680px) {
+    .mobiletablescrolling {
+        overflow-x: scroll;
+    }
+  }
+</style>
+<div [hidden]="isLoaded">
+  <!-- loading visual, it sometimes takes a few seconds to get the token (in testing/sandbox) -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-align-justify" (click)="isClientTableCollapsed = !isClientTableCollapsed" style="cursor: pointer;opacity:0.5;"></i> 
+
+          <div class="form-group row" style="width:43%;float:right;" [hidden]="isClientTableCollapsed || clientscount<=0" >
+            <div class="col-md-12">
+              <div class="input-group">
+                <span class="input-group-prepend">
+                  <button type="button" class="btn btn-primary" tooltip="Table search" (click)="focusSearch()"><i class="fa fa-search"></i> </button>
+                </span>
+                <input type="text" class="form-control" placeholder=" " id="clienttablesearch" (keyup)="TableSeachElemChanged()">
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="card-body mobiletablescrolling" [collapse]="isClientTableCollapsed">
+          <div [hidden]="clientscount>0 || currentPageLoaded>1">Welcome!&nbsp; At this time, no clients have been added. <br/><br/> 
+            To get started, click the <a routerLink="../client/add" routerLinkActive="active"><i class="nav-icon icon-user-follow"></i> Add Client</a> button. <br/><br/>
+          </div>
+          <div *ngIf="clientscount==0 && currentPageLoaded>1 && userPaginationSettingEnabled()">There are no clients on this page. <br/><br/> 
+            To fix this, please go back to page 1 or a previous page. <br/><br/>
+          </div>
+          <div *ngIf="userPaginationSettingEnabled() && currentPages>1 && rowsDisplayedAfterSearch==0 && tablesearch"> There are no results after searching.<br/><br/> 
+            Suggestion: you can temporarily remove pagination, request all the data, and retry the search <a href="#" (click)="setPaginationOffAndSearch()"><i class="fa fa-magic"></i> click here</a>. <br/><br/>
+          </div>
+          <table class="table table-bordered table-striped table-sm" id="clientTable" [hidden]="(userPaginationSettingEnabled() && rowsDisplayedAfterSearch==0 && tablesearch) || clientscount==0">
+            <thead>
+              <tr>
+                <th width="30%" (click)="sortctablebyname(0)" style="cursor:pointer;">Name</th>
+                <!--<th>Email</th>
+                <th>Address</th>-->
+                <th [hidden]="accesslevel()<5" width="2%" (click)="sortctablebyname(1)" style="cursor:pointer;">Therapist</th> <!-- only if access level is higher than 5 add this row -->
+                <th width="1%">Status</th>
+                <!--<th width="1%">Actions</th>-->
+              </tr>
+            </thead>
+            <tbody id="clienttableBody">
+              <!--
+              <tr>
+                <td>Vishnu Serghei</td>
+                <td>2012/01/01</td>
+                <td>Member</td>
+                <td>
+                  <span class="badge badge-success">Active</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Zbyněk Phoibos</td>
+                <td>2012/02/01</td>
+                <td>Staff</td>
+                <td>
+                  <span class="badge badge-danger">Banned</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Einar Randall</td>
+                <td>2012/02/01</td>
+                <td>Admin</td>
+                <td>
+                  <span class="badge badge-secondary">Inactive</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Félix Troels</td>
+                <td>2012/03/01</td>
+                <td>Member</td>
+                <td>
+                  <span class="badge badge-warning">Pending</span>
+                </td>
+              </tr>
+              -->
+            </tbody>
+          </table>
+          <nav *ngIf="paginationIsRequired()" [hidden]="(rowsDisplayedAfterSearch==0 && tablesearch) || clientscount==0">
+            <ul class="pagination" style="flex-wrap: wrap;">
+              <li class="page-item"><a class="page-link" href="#" (click)="handlePaginationPrev()">Prev</a></li>
+              <li *ngFor="let number of currentPagesAngularFix; let i = index; let first = first;" [ngClass]="{'active': first}" class="page-item"><a class="page-link" href="#" (click)="handlePagination($event, i+1)">{{i+1}}</a> <div *ngIf="index%40==0"><br/></div></li>
+              <li class="page-item"><a class="page-link" href="#" (click)="handlePaginationNext()">Next</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <!--/.col-->
+  </div>
+  <!--/.row-->
+
+</div>

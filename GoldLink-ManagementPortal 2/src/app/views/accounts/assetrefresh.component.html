@@ -1,0 +1,50 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card" *ngIf="isLoaded">
+        <div class="card-header">
+          <i class="icon-refresh icons font-2xl d-block mt-4" style="display: inline !important;top:2px;position:relative;font-size:16px !important;"></i>  <strong>Asset Refresh</strong>
+          <small></small>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <i>List of the basic account details</i><br/><br/>
+       
+              Institution: <b>{{account.metainstitution}}</b>
+              <br/>Name: {{account.name}}
+              <br/>Type: {{account.type}}
+              <br/>Mask: {{account.metaaccountmask}}
+              <hr style="width:100%"/>
+            </div>
+          </div><!--/.row-->
+          <div class="row">
+            <label for="reportrange" tooltip="Optional: increase number of days" style="margin-left:12px;margin-top:3px;">Requested Date Range</label>
+            &nbsp;&nbsp;
+            <input type="range" id="reportrange" name="reportrange" min="90" max="720" value="90" step="30" (change)="updateReportRange()">
+            &nbsp;&nbsp;<small style="margin-top:3px;">{{currentReportRange}} days</small>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer">
+          <strong style="font-size:11px;color:red;" [hidden]="refreshresponsetype!=2">Failed to create new asset report</strong>
+          <strong style="font-size:11px;color:green;" [hidden]="refreshresponsetype!=3">Successfully created a new asset report!</strong>
+          <strong style="font-size:11px;color:red;" [hidden]="refreshresponsetype!=5">Failed to create new asset report, error information was retrieved!</strong>
+          <small style="font-size:11px;" [hidden]="refreshresponsetype!=5 && errorresponse.length>0">{{errorresponse}}</small>
+          <small [hidden]="refreshresponsetype!=1"><i class="fa fa-refresh fa-lg fa-spin" style="color:rgb(0, 132, 255);"></i><br/></small>
+          <strong style="font-size:11px;" [hidden]="refreshresponsetype!=1">Please wait.. the request could take up to a whole minute</strong>
+          <br [hidden]="refreshresponsetype==0"><br [hidden]="refreshresponsetype==0">
+          <button type="submit" class="btn btn-sm btn-primary" [disabled]='currentReportRange<90||currentReportRange>720||refreshresponsetype==1' (click)="RefreshAssetReport(account.id)"><i class="fa fa-bullseye"></i> Request</button>
+          <button type="reset" class="btn btn-sm btn-link" [hidden]='responsetype==0||responsetype!=2' (click)="gotoView()"><i class="fa fa-angle-double-left "> Back</i> </button>
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div>
+</div>

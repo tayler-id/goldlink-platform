@@ -1,0 +1,205 @@
+<!-- Mobile Responsive Code for buttons and view -->
+<style>
+
+  @media (max-width: 700px) {
+    .action-btn { 
+    margin-top:3px !important;
+    width:99% !important;
+    }
+    p {
+      /*margin-top: revert;*/
+      margin-bottom: revert;
+    }
+    .VideoSessionTitle {
+      width: 203px;
+    }
+
+
+    /*.text-timestamp{
+      display: none;
+    }*/
+
+    .button-edit{
+      margin-top: -1%;
+    }
+
+  }
+  .button-edit{
+      margin-top: -4px;
+    }
+
+  .sk-chase-dot:before{
+    background-color: lightblue;
+  }
+
+  .btn-sq-lg {
+  width: 145px !important;
+  height: 145px !important;
+  font-weight: 600 !important;
+  line-height: 50px !important;
+  margin-top: 5px;
+  }
+
+  .btn-sq {
+    width: 100px !important;
+    height: 100px !important;
+    font-size: 10px;
+    font-weight: 600 !important;
+    line-height: 50px !important;
+  }
+
+  .btn-sq-sm {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 10px;
+  }
+
+  .btn-sq-xs {
+    width: 25px !important;
+    height: 25px !important;
+    padding:2px;
+  }
+
+</style>
+
+<div [hidden]="isLoaded">
+  <!-- loading visual, it sometimes takes a few seconds to get the token (in testing/sandbox) -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+
+  <div class="card" *ngIf="clientresponsetype==1">
+    <div class="card-header" style="background-color:#f0f3f585">
+      <span>View Client Information</span> &nbsp; <button type="button" class="btn btn-block btn-link button-edit" style="color:#20a8d8;background-color:white;" (click)="gotoEdit()" tooltip="Click to edit client" style="width:fit-content;font-size:11px;display:inline-block;">Edit <i class='cil-pencil c-icon c-icon-3xl c-icon-fix'></i></button>
+      <button *ngIf="getAccessLevel() >= 5" type="button" class="btn btn-block btn-link button-edit" data-toggle="modal" (click)="smallModal.show()" tooltip="Click to remove this client" style="width:fit-content;font-size:11px;display:inline-block;color:#d85420;margin-left:-3px;">Remove <i class='cil-delete c-icon c-icon-3xl c-icon-fix' style="font-size:11px;"></i></button>
+      
+      <div class="card-header-actions">
+        &nbsp;
+        <!--<small class="text-timestamp" className="text-muted">Created on {{client.creationtime | date:'shortDate'}}</small>-->
+        <!--<small><button type="button" class="btn btn-block btn-link" (click)="gotoEdit()" title="Click to edit client details" style="position:absolute;top:7.7px;left:125px;width:fit-content;font-size:11px;">edit<i class='cil-color-border c-icon c-icon-3xl c-icon-fix'></i></button></small>-->
+      </div>
+    </div>
+    <div class="card-body" [collapse]="isCollapsed">
+      <p><b>Name:</b> {{client.name}}</p>
+      <p *ngIf="client.addr.length>0"><b>Address:</b> {{client.addr}}</p>
+      <p *ngIf="client.phone.length>0"><b>Phone:</b> {{client.phone}}</p>
+      <p *ngIf="client.email.length>0"><b>Email:</b> {{client.email}}</p>
+      <p *ngIf="client.medicarenum.length>0"><b>Medicare#:</b> {{client.medicarenum}}</p>
+      <p *ngIf="client.notes.length>0"><b>Notes:</b> {{client.notes}}</p>
+      <p *ngIf="clientLastPhysician"><b>Therapist:</b> {{clientLastPhysician}}</p>
+      <p><b>Created on:</b> <small class="text-timestamp"> {{client.formattedCreationTime}}</small> </p>
+      <p *ngIf="clientLastScheduled"><b>Last Scheduled:</b> <small class="text-timestamp"> {{clientLastScheduled}}</small> </p>
+      <p *ngIf="clientNextScheduled"><b>Next Scheduled:</b> <small class="text-timestamp"> {{clientNextScheduled}}</small> </p>
+
+      <p style="display:inline-block;width:fit-content;"><b>Status:</b> {{roomClientString}}</p> &nbsp; <div class="sk-chase" style="display:inline-block;height:26px;width:26px;top:0px;"><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div></div>
+    
+      <!--<p style="width:fit-content;" tooltip="Set if a user has recieved a link token, so it's likely they viewed the plaid interface at least once">Plaid Viewed: <span *ngIf="client.hasInitiatedLinkToken; else hasNotUsedPlaid"><b>Yes</b></span><ng-template #hasNotUsedPlaid><b>No</b></ng-template></p>
+      -->
+      <hr/>
+      <!--<p tooltip='URL can be sent to client(s), or used to start/join a video session&#013;This URL is accessible to anyone once sent.' style='width:fit-content'><b>Video Session Related:</b> {{client.emulatedVideoRoomURL}}</p> -->
+      
+      <div class="row" style="margin-left:0px;margin-right:0px;">
+        <p tooltip='Actions&#013;' style='margin-bottom:3px;' class="VideoSessionTitle"><b>Actions:</b> <!--{{client.emulatedVideoRoomURL}}--></p>
+        <!--<button type="button" class="btn btn-block btn-link action-btn" data-toggle="modal" (click)="primaryModal.show()" tooltip="Click to copy URL to clipboard, sending this to others will allow them to join the session." style="position:relative;width:fit-content;margin-top:-8px;font-size:15px;">Invite a Client<i class='cil-clipboard c-icon c-icon-3xl c-icon-fix' style="font-size:16px"></i></button>-->
+        <button type="button" class="btn btn-block btn-link action-btn" data-toggle="modal" (click)="primaryModal.show()" tooltip="Click to join or prepare a video session for this client." style="position:relative;width:fit-content;margin-top:-8px;font-size:15px;">Start a Session<i class='cil-external-link c-icon c-icon-3xl c-icon-fix' style="font-size:16px"></i></button>
+        <button type="button" class="btn btn-block btn-link action-btn" (click)="gotoClientCalendarRoom()" tooltip="Click to view calendar events for this client." style="position:relative;width:fit-content;margin-top:-8px;font-size:15px;">View Scheduling<i class='cil-calendar c-icon c-icon-3xl c-icon-fix' style="font-size:16px"></i></button>
+        <!--<button type="button" class="btn btn-block btn-link action-btn" (click)="gotoClientVideoRoomOld()" tooltip="Click to join or start a video session (compatibility, older version)" style="position:relative;width:fit-content;margin-top:-8px;font-size:13px;">Go to Session (compatibility mode)<i class='cil-fix c-icon c-icon-3xl c-icon-fix' style="font-size:16px"></i></button>-->
+      </div>
+
+      <!-- Begin actions -->
+      <!--<hr/>
+        <div class="row" style="justify-content: center;">
+          <div class="col-sm-1" style="max-width:fit-content;">
+          <button type="button" class="btn btn-block btn-link" style="color:#20a8d8;background-color:white;" (click)="gotoEdit()" tooltip="Click to edit client" style="width:fit-content;font-size:11px;">Edit Client<i class='cil-pencil c-icon c-icon-3xl c-icon-fix'></i></button>
+          </div>
+          <div class="col-sm-1" style="max-width:fit-content;">
+          <button type="button" class="btn btn-block btn-link" style="color:#20a8d8;background-color:white;" [disabled]="true" tooltip="Click to merge bank accounts from another client" style="width:fit-content;font-size:11px;">Merge Client(s)<i class='cil-library-add c-icon c-icon-3xl c-icon-fix'></i></button>
+          </div>
+        </div>-->
+      <!-- End actions -->
+
+      <!-- Begin modal -->
+      <div bsModal #primaryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-primary" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Share Session Link</h4>
+              <!--<button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>-->
+            </div>
+            <div class="modal-body">
+              <div class="col-lg-12">
+                <p>
+                  <a [routerLink]="" class="btn btn-sq-lg btn-success" (click)="SendClientEmail()">
+                    <i class="cil-send c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+                    Send Email<br>
+                  </a>
+                  <a [routerLink]="" class="btn btn-sq-lg btn-info" style="color:white;" (click)="SendClientText()">
+                    <i class="cil-screen-smartphone c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+                    Send Text<br>
+                  </a>
+                  <a [routerLink]="" class="btn btn-sq-lg btn-primary" (click)="copyClientVideoURL()">
+                    <i class="cil-clipboard c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+                    Copy to Clipboard<br>
+                  </a>
+                </p>
+                <hr/>
+                <p>Click options above to share session.</p>
+
+                <p *ngIf="emailresponsetype>0"> 
+                  &nbsp;
+                  <strong style="font-size:10px;color:red;" [hidden]="emailresponsetype!=3">Email failed to send</strong>
+                  <strong style="font-size:10px;color:green;" [hidden]="emailresponsetype!=4">Email was sent!</strong>
+                  <strong style="font-size:10px;color:red;" [hidden]="emailresponsetype!=5">No email to send to.</strong>
+                </p>
+                <p *ngIf="textresponsetype>0"> 
+                  &nbsp;
+                  <strong style="font-size:10px;color:red;" [hidden]="textresponsetype!=3">Text failed to send</strong>
+                  <strong style="font-size:10px;color:green;" [hidden]="textresponsetype!=4">Text was sent!</strong>
+                  <strong style="font-size:10px;color:red;" [hidden]="textresponsetype!=5">No phone# to send to.</strong>
+                </p>
+
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="primaryModal.hide()">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+      <!-- End modal -->
+
+      <!-- Begin modal -->
+      <div bsModal #smallModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Confirm Irreversible Action</h4>
+            </div>
+            <div class="modal-body">
+              <p>Do you want to remove this client?</p>
+              <p>None of this data will be retained.</p>
+              <p>The same client can be re-added afterwards.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" (click)="deleteCurrentClient()">Remove</button>
+              <button type="button" class="btn btn-secondary" (click)="smallModal.hide()">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+      <!-- End modal -->
+
+
+    </div>
+    <!--<div class="card-footer">
+      <button type="button" class="btn btn-primary" (click)="isCollapsed = !isCollapsed">Collapse</button>
+    </div>-->
+  </div>
+
+</div>

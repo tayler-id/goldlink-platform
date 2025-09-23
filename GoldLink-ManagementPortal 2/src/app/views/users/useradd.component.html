@@ -1,0 +1,56 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>Add User</strong>
+          <small>- add a user to your company</small>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="fname">First Name</label>
+                <input type="text" class="form-control" id="fname" placeholder="Firstname" maxlength=32 (keyup)="fnamevalid()">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="lname">Last Name</label>
+                <input type="text" class="form-control" id="lname" placeholder="Lastname" maxlength=32 (keyup)="lnamevalid()">
+              </div>
+            </div>
+          </div><!--/.row-->
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="name">Email</label>
+                <input type="text" class="form-control" id="email" placeholder="optional: email" maxlength=127 (keyup)="useremailvalid()">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" placeholder="optional: (xxx)xxx-xxxx" maxlength=16>
+              </div>
+            </div>
+          </div><!--/.row-->
+          <div class="row">
+            <div class="form-group col-sm-12">
+              <label for="usrtitle">Title</label>
+              <input type="text" class="form-control" id="usrtitle" placeholder="optional: Therapist/Other" maxlength=16>
+            </div>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer">
+          <strong style="font-size:11px;color:red;" [hidden]="responsetype!=1">User cannot be added.</strong>
+          <strong style="font-size:11px;" [hidden]="responsetype!=2">Added user. <br/><p>Credentials (store or keep these somewhere safe):</p> <p>Username: {{CreatedUser.user}}</p> <p> Password: {{CreatedUser.pass}}</p></strong>
+          <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+          <button type="submit" class="btn btn-sm btn-primary" [disabled]='!nameisvalid || !emailisvalid || !nameisvalid2' (click)="CreateUser()"> Add</button>
+          <button type="reset" class="btn btn-sm btn-link" style="margin-left:3px" (click)="gotoUsers()"><i class="fa fa-angle-double-left "> Back</i> </button>
+          <!--<button type="reset" class="btn btn-sm btn-danger" (click)="ResetForm()" style="margin-left:3px;"> Reset</button>-->
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<style>
+    @media (max-width: 680px) {
+      .mobiletablescrolling {
+          overflow-x: scroll;
+      }
+    }
+  </style>
+  <div [hidden]="isLoaded">
+    <!-- loading visual, it sometimes takes a few seconds to get the token (in testing/sandbox) -->
+    <div style="z-index:9;">
+      <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+      </svg>
+    </div>
+  </div>
+  <div class="animated fadeIn" [hidden]="!isLoaded">
+  
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <i class="fa fa-align-justify" (click)="isUserTableCollapsed = !isUserTableCollapsed" style="cursor: pointer;opacity:0.5;"></i> 
+  
+            <div class="form-group row" style="width:43%;float:right;" [hidden]="isUserTableCollapsed">
+              <div class="col-md-12">
+                <div class="input-group">
+                  <span class="input-group-prepend">
+                    <button type="button" class="btn btn-primary" tooltip="Table search" (click)="focusSearch()"><i class="fa fa-search"></i> </button>
+                  </span>
+                  <input type="text" class="form-control" placeholder=" " id="usertablesearch" (keyup)="TableSeachElemChanged()">
+                </div>
+              </div>
+            </div>
+  
+          </div>
+          <div class="card-body mobiletablescrolling" [collapse]="isUserTableCollapsed">
+            <table class="table table-bordered table-striped table-sm" id="userTable">
+              <thead>
+                <tr>
+                  <th width="30%">Name</th>
+                  <th width="2%">Email</th>
+                  <th width="2%">Phone</th>
+                  <th width="1%">Group</th>
+                  <th width="1%">Status</th>
+                  <!--<th width="1%">Actions</th>-->
+                </tr>
+              </thead>
+              <tbody id="usertableBody">
+              </tbody>
+            </table>
+            <nav>
+            </nav>
+
+            <hr/>
+            <!--<p tooltip='URL can be sent to client(s), or used to start/join a video session&#013;This URL is accessible to anyone once sent.' style='width:fit-content'><b>Video Session Related:</b> {{client.emulatedVideoRoomURL}}</p> -->
+            
+            <div class="row" style="margin-left:0px;margin-right:0px;">
+              <p tooltip='Actions&#013;' style='margin-top:revert;' class="VideoSessionTitle"><b>Actions:</b></p>
+              <button type="button" class="btn btn-block btn-link action-btn" data-toggle="modal" (click)="gotoAddUsers()" tooltip="Click to add a user to your company." style="position:relative;width:fit-content;font-size:15px;">Add a User<i class='cil-user-follow c-icon c-icon-3xl c-icon-fix' style="font-size:16px"></i></button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!--/.col-->
+    </div>
+    <!--/.row-->
+  
+  </div>
+  

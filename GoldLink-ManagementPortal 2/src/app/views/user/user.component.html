@@ -1,0 +1,20 @@
+<style>
+    @media (max-width: 680px) {
+      .mobiletablescrolling {
+          overflow-x: scroll;
+      }
+    }
+  </style>
+<div [hidden]="isLoaded">
+  <!-- loading visual, it sometimes takes a few seconds to get the token (in testing/sandbox) -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+  
+</div>
+
+  

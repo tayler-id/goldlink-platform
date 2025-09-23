@@ -1,0 +1,386 @@
+<style>
+.btn-sq-lg {
+/*width: 155px !important;
+height: 145px !important;*/
+font-weight: 600 !important;
+line-height: 50px !important;
+margin-top: 5px;
+}
+
+.btn-sq {
+  width: 100px !important;
+  height: 100px !important;
+  font-size: 10px;
+  font-weight: 600 !important;
+  line-height: 50px !important;
+}
+
+.btn-sq-sm {
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 10px;
+}
+
+.btn-sq-xs {
+  width: 25px !important;
+  height: 25px !important;
+  padding:2px;
+}
+
+.modal-primary .modal-header {
+  background-color: #20a4d8 !important;
+}
+</style>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+
+<div class="animated fadeIn row" [hidden]="!isLoaded">
+
+  <div class="animated fadeIn col-lg-6" [hidden]="!isLoaded">
+      <div class="row" style="margin-right:15px">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header" style="font-weight:700;cursor: pointer;" (click)="isSchedulingTableCollapsed = !isSchedulingTableCollapsed">
+              <i class="fa fa-align-justify"></i>View Scheduled Times
+            </div>
+            <div class="card-body" [collapse]="isSchedulingTableCollapsed">
+              <div *ngIf="numberOfUpcomingSchedules==0">No upcoming sessions are scheduled.</div>
+
+              <table class="table" id="schedulingtable1" *ngIf="numberOfUpcomingSchedules>0">
+                <thead>
+                  <tr>
+                    <th (click)="sortctablebyname(0)">Client</th>
+                    <th (click)="sortctablebyname(1)">Time</th>
+                    <th>Relevance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let schedule of schedules">
+                    <ng-container *ngIf="schedule.hasPassed !== 'Past'">
+                    <td>{{schedule.name}}</td>
+                    <td>{{schedule.formattedDate2}}</td>
+                    <td>{{schedule.hasPassed}}</td>
+                    </ng-container>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+      </div>
+      <!--/.row-->
+  </div>
+  <div class="animated fadeIn col-lg-6" [hidden]="!isLoaded && !timeZone">
+    <div class="animated fadeIn">
+
+      <div class="row" style="margin-right:15px">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header" style="font-weight:700;cursor: pointer;" (click)="isInfoCollapsed = !isInfoCollapsed">
+              <i class="fa fa-align-justify"></i>View Time
+            </div>
+            <div class="card-body" [collapse]="isInfoCollapsed">
+              <p style="display:inline-block;"><i>{{timeString}} <span *ngIf="dayLightSavings" style="display:inline-block;font-size:12px;">&nbsp;(Daylight savings time is in effect)</span></i>&nbsp;&nbsp;<button type="button" class="btn btn-block btn-link button-edit" style="color:#20a8d8;background-color:white;display:inline-block;" (click)="gotoSettings()" tooltip="Click to set timezone settings" style="width:fit-content;font-size:11px;display:inline-block;"><i class='cil-settings c-icon c-icon-fix'></i> Timezone Settings</button>
+              </p>
+            </div>
+          </div>
+        </div>
+        <!--/.col-->
+      </div>
+      <!--/.row-->
+
+    </div>
+  </div>
+
+</div>
+
+<div class="animated fadeIn" [hidden]="!isLoaded">
+
+    <div class="row" style="margin-left:-14px;">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header" style="font-weight:700;cursor: pointer;" (click)="isCalendarCollapsed = !isCalendarCollapsed">
+            <i class="fa fa-align-justify"></i>Calendar
+          </div>
+          <div class="card-body" [collapse]="isCalendarCollapsed">
+            <div id="calendar"></div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <br/><br/>
+
+    <!--<button type="reset" class="btn btn-sm btn-link" (click)="gotoView()" style="margin-top:15px;margin-bottom:15px;"><i class="fa fa-angle-double-left "> Back</i> </button>-->
+    <br/><br/><br/><br/><br/>
+  <!-- Begin modal -->
+  <div bsModal #pickDateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-primary" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Set Session Date - {{datetopstr}}</h4>
+          <!--<button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>-->
+        </div>
+        <div class="modal-body">
+
+          <div class="form-group col-lg-12">
+            <label for="clientname">Select a Client</label><br/>
+            <select class="form-control" id="clientname" style="display: inline-block;width:100%" (change)="onClientNameChange($event)">
+              <option value="0" selected>None Selected</option> 
+              <option *ngFor="let client of clients" value="{{client.id}}">{{client.name}}</option> 
+            </select>
+          </div>
+
+          <div class="col-lg-12">
+            <div #inputTimepicker style="z-index:2;">
+              <label for="timename">Select Time</label><br/>
+              <input type="text" class="timepicker-ui-input" value="09:00 AM" id="timename"/>
+              <span style="position:absolute;margin-top:4px;margin-left:-20px;z-index:1"> <i class='cil-clock c-icon c-icon-3xl c-icon-fix'></i> </span>
+            </div>
+            <br/>
+
+            <div class="form-group">
+              <label for="minutes">Session Length: {{sessionLength}} minutes</label>
+              <input #minuteselector type="range" class="form-control" id="minutes" min="10" max="150" value="30" step="5" (input)="setMinutes(minuteselector.value)">
+            </div>
+
+            <div style="z-index:9;" *ngIf="clientLoadedStatus==1">
+              <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+              </svg>
+            </div>
+
+            <p *ngIf="!hasPhone && !hasEmail && clientLoadedStatus>1" style="font-size:12px">
+              Please add a valid client email or phone# for notification options!
+            </p>
+
+            <div style="display: inline-block;" [hidden]="!hasEmail">
+              <label class="switch switch-3d switch-warning" style="margin-top:18px;">
+                <input type="checkbox" class="switch-input" id="notifemail">
+                <span class="switch-slider"></span>
+              </label>
+              <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify using Email</span>
+            </div>
+            <br/>
+
+            <div style="display: inline-block;" [hidden]="!hasPhone">
+              <label class="switch switch-3d switch-warning" style="margin-top:10px;">
+                <input type="checkbox" class="switch-input" id="notiftext">
+                <span class="switch-slider"></span>
+              </label>
+              <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify using Text</span>
+            </div>
+            <br/>
+
+            <div style="display: inline-block;" [hidden]="!hasPhone && !hasEmail">
+              <label class="switch switch-3d switch-info" style="margin-top:10px;">
+                <input type="checkbox" class="switch-input" id="notif24">
+                <span class="switch-slider"></span>
+              </label>
+              <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify 24 hours before</span>
+            </div>
+            <br/>
+
+            <div style="display: inline-block;" [hidden]="!hasPhone && !hasEmail">
+              <label class="switch switch-3d switch-info" style="margin-top:10px;">
+                <input type="checkbox" class="switch-input" id="notif1">
+                <span class="switch-slider"></span>
+              </label>
+              <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify 1 hour before</span>
+            </div>
+            <br/>
+
+            <hr/>
+            <p>Set options above to set up a scheduled session date.</p>
+  
+            <p *ngIf="addscheduleresponsetype>0"> 
+              &nbsp;
+              <strong style="font-size:10px;color:red;" [hidden]="addscheduleresponsetype!=2">Failed to add date. Does the same session already exist?</strong>
+              <strong style="font-size:10px;color:red;" [hidden]="addscheduleresponsetype!=3">Failed to add date. It overlaps with an existing session.</strong>
+              <strong style="font-size:10px;color:green;" [hidden]="addscheduleresponsetype!=1">Date was added successfully.</strong>
+            </p>
+  
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" [disabled]="clientIDSelected==0" (click)="AddScheduleforUserClient();">Add</button>
+          <button type="button" class="btn btn-secondary" (click)="pickDateModal.hide()">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- End modal -->  
+
+
+  <!-- Begin modal -->
+  <div bsModal #pickActionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-primary" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Choose Action - {{datetopstr}}</h4>
+          <!--<button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>-->
+        </div>
+        <div class="modal-body">
+          
+          <a [routerLink]="" class="btn btn-sq-lg btn-success" (click)="pickActionModal.hide();pickDateModal.show();">
+            <i class="cil-calendar c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+            Add New Schedule<br>
+          </a>
+          <a [routerLink]="" class="btn btn-sq-lg btn-info" style="color:white;" (click)="pickActionModal.hide();editDateModal.show();">
+            <i class="cil-calendar-check c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+            Edit Existing Schedule<br>
+          </a>
+          <a [routerLink]="" class="btn btn-sq-lg btn-secondary" style="color:white;width:145px;" (click)="pickActionModal.hide()">
+            <i class="cil-x c-icon c-icon-3xl c-icon-fix" style="font-size:20px"></i><br/>
+            Close<br>
+          </a>
+          
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- End modal -->  
+
+    <!-- Begin modal -->
+    <div bsModal #editDateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-primary" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 *ngIf="!client" class="modal-title">Edit Session on {{datetopstr}}</h4>
+            <h4 *ngIf="client" class="modal-title">Edit Session with {{client.name}} on {{datetopstr}}</h4>
+            <!--<button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>-->
+          </div>
+          <div class="modal-body">
+            
+            <div *ngIf="editModalStatus==0">
+              <h3>Select a session from below.</h3><br/>
+              <p *ngFor="let entry of trimmedschedules" style="margin-top:4px;">
+                <a [routerLink]="" (click)="editModalGoTo(entry.id)">{{entry.formattedDate}} for {{entry.length}} minutes with {{entry.clientname}}</a>
+              </p>
+            </div>
+
+            <div *ngIf="editModalStatus==1">
+              
+              <div class="form-group">
+                <label for="minutes2">Session Length: {{sessionLength}} minutes</label>
+                <input #minuteselector2 type="range" class="form-control" id="minutes2" min="10" max="150" value="30" step="5" (input)="setMinutes(minuteselector2.value)">
+              </div>
+
+              <div style="z-index:9;" *ngIf="clientLoadedStatus==1">
+                <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+                </svg>
+              </div>
+  
+              <p *ngIf="!hasPhone && !hasEmail && clientLoadedStatus>1" style="font-size:12px">
+                Please add a valid client email or phone# for notification options!
+              </p>
+  
+              <div style="display: inline-block;" [hidden]="!hasEmail">
+                <label class="switch switch-3d switch-warning" style="margin-top:18px;">
+                  <input type="checkbox" class="switch-input" id="notifemail2" checked>
+                  <span class="switch-slider"></span>
+                </label>
+                <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify using Email</span>
+              </div>
+              <br/>
+  
+              <div style="display: inline-block;" [hidden]="!hasPhone">
+                <label class="switch switch-3d switch-warning" style="margin-top:10px;">
+                  <input type="checkbox" class="switch-input" id="notiftext2" checked>
+                  <span class="switch-slider"></span>
+                </label>
+                <span style="position:absolute;margin-top:10px;margin-left:15px;">Notify using Text</span>
+              </div>
+              <br/>
+  
+              <div style="display: inline-block;" [hidden]="!hasPhone && !hasEmail">
+                <label class="switch switch-3d switch-info" style="margin-top:10px;">
+                  <input type="checkbox" class="switch-input" id="notif242" checked>
+                  <span class="switch-slider"></span>
+                </label>
+                <span style="position:absolute;margin-top:19px;margin-left:15px;">Notify 24 hours before</span>
+              </div>
+              <br/>
+  
+              <div style="display: inline-block;" [hidden]="!hasPhone && !hasEmail">
+                <label class="switch switch-3d switch-info" style="margin-top:10px;">
+                  <input type="checkbox" class="switch-input" id="notif12" checked>
+                  <span class="switch-slider"></span>
+                </label>
+                <span style="position:absolute;margin-top:19px;margin-left:15px;">Notify 1 hour before</span>
+              </div>
+              <br/>
+
+              <div style="display: inline-block;">
+                <label class="switch switch-3d switch-danger" style="margin-top:10px;">
+                  <input type="checkbox" class="switch-input" id="cancelsession2">
+                  <span class="switch-slider"></span>
+                </label>
+                <span style="position:absolute;margin-top:10px;margin-left:15px;">Cancel this session</span>
+              </div>
+              <br/>
+
+              <p *ngIf="editscheduleresponsetype>0"> 
+                &nbsp;
+                <strong style="font-size:10px;" [hidden]="editscheduleresponsetype!=2">Session failed to update, or nothing changed..</strong>
+                <strong style="font-size:10px;color:green;" [hidden]="editscheduleresponsetype!=1">Session editted successfully.</strong>
+              </p>
+
+            </div>
+            
+          </div>
+          <div class="modal-footer">
+            <button *ngIf="editModalStatus==1" type="button" class="btn btn-primary" (click)="EditScheduleforUserClient()">Edit</button>
+            <button type="button" class="btn btn-secondary" (click)="editDateModal.hide()">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- End modal -->  
+
+    <!-- Begin modal -->
+    <div bsModal #setDateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" (onHidden)="onSetupClosed()">
+    <div class="modal-dialog modal-primary" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Details of session listed below.</h4>
+          <!--<button type="button" class="close" (click)="setDateModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>-->
+        </div>
+        <div class="modal-body" *ngIf="lastSetData.date">
+          
+          <p>You have set a session at {{lastSetData.date}} with {{lastSetData.clientname}}.</p>
+
+          <p *ngIf="lastSetData.sentemail">Your email has been sent.</p>
+
+          <p *ngIf="lastSetData.senttext">Your text has been sent.</p>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="setDateModal.hide()">Ok</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- End modal -->  
+
+</div>

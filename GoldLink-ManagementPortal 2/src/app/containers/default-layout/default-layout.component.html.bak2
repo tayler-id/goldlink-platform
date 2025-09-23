@@ -1,0 +1,79 @@
+<div class="app-body" style="margin-top:0px">
+  <app-sidebar #appSidebar [fixed]="true" [display]="'lg'" [minimized]="sidebarMinimized" (minimizedChange)="toggleMinimize($event)" style="height:calc(100vh);">
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="appSidebar.minimized"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main">
+    <!-- Breadcrumb -->
+    <!-- breaking change 'cui-breadcrumb' -->
+    <cui-breadcrumb>
+      <!-- Breadcrumb Menu-->
+      <li class="breadcrumb-menu d-md-down-none">
+        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+          <!--<a class="btn" href="#"><i class="icon-speech"></i></a>
+          <a class="btn" [routerLink]="['/dashboard']"><i class="icon-graph"></i> &nbsp;Dashboard</a>
+          <a class="btn" href="#"><i class="icon-settings"></i> &nbsp;Settings</a>-->
+        </div>
+      </li>
+    </cui-breadcrumb>
+    <!-- deprecation warning for 'app-breadcrumb' -->
+    <!--<ol class="breadcrumb">-->
+      <!--<app-breadcrumb></app-breadcrumb>-->
+      <!--&lt;!&ndash; Breadcrumb Menu&ndash;&gt;-->
+      <!--<li class="breadcrumb-menu d-md-down-none">-->
+        <!--<div class="btn-group" role="group" aria-label="Button group with nested dropdown">-->
+          <!--<a class="btn" href="#"><i class="icon-speech"></i></a>-->
+          <!--<a class="btn" [routerLink]="['/dashboard']"><i class="icon-graph"></i> &nbsp;Dashboard</a>-->
+          <!--<a class="btn" href="#"><i class="icon-settings"></i> &nbsp;Settings</a>-->
+        <!--</div>-->
+      <!--</li>-->
+    <!--</ol>-->
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div><!-- /.container-fluid -->
+  </main>
+  <app-aside [fixed]="true" [display]="false" [ngClass]="'test'">
+    <tabset>
+      <tab>
+        <ng-template tabHeading><i class="icon-list"></i></ng-template>
+        <div class="list-group list-group-accent">
+          <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Today</div>
+          <div class="list-group-item list-group-item-accent-warning list-group-item-divider">
+
+          </div>
+          <div class="list-group-item list-group-item-accent-info">
+
+          </div>
+          <div class="list-group-item list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Tomorrow</div>
+          <div class="list-group-item list-group-item-accent-danger list-group-item-divider">
+
+          </div>
+          <div class="list-group-item list-group-item-accent-success list-group-item-divider">
+          
+          </div>
+          <div class="list-group-item list-group-item-accent-primary list-group-item-divider">
+          </div>
+        </div>
+      </tab>
+      <tab>
+        <ng-template tabHeading><i class="icon-speech"></i></ng-template>
+        <div class="p-3">
+          <h6>Notifications</h6>
+          
+        </div>
+      </tab>
+      <tab>
+        <ng-template tabHeading><i class="icon-settings"></i></ng-template>
+        <div class="p-3">
+          <h6>Settings</h6>
+        
+        </div>
+      </tab>
+    </tabset>
+  </app-aside>
+</div>
+<app-footer>
+  <span><a href="https://bluemoonseniorcounseling.com/" target="_blank">BlueMoon</a> &copy; 2022.</span>
+  <!--<span class="ml-auto">Powered by <a href="https://coreui.io/angular">CoreUI for Angular</a></span>-->
+</app-footer>

@@ -1,0 +1,49 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>Change Global Settings</strong>
+          <small> </small>
+        </div>
+          <div class="card-body">
+            <div class="row" [hidden]="getresponsetype!=1">
+              <div class="form-group col-sm-5" tooltip="Allow users to go to /login path and sign up themselves as a new email/client (otherwise, only existing emails will allow them to proceed)">
+                <label for="ccyear">Allow self registration</label>
+                <select class="form-control" id="userregistration">
+                  <option value='0'>No</option>
+                  <option value='1'>Yes</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-5" tooltip="2-Factor Authentication settings (2FA)">
+                <label for="twofactorauth">Set 2FA</label>
+                <select class="form-control" id="twofactorauth">
+                  <option value='0'>Off</option>
+                  <option value='1'>Always Prompt</option>
+                  <!--<option value='2'>Prompt on new IP</option>-->
+                </select>
+              </div>
+            </div>
+            <div class="row" [hidden]="getresponsetype<=1">
+              Global settings were not retrievable, thus it is not allowed to set them.
+            </div>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer" [hidden]="getresponsetype!=1">
+          <strong style="font-size:11px;color:green;" [hidden]="responsetype!=1">Successfully changed setting(s)</strong>
+          <strong style="font-size:11px;" [hidden]="responsetype!=2">No changes were made</strong>
+          <strong style="font-size:11px;color:red;" [hidden]="responsetype!=3">Not authorized to change setting(s)</strong>
+          <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+          <button type="submit" class="btn btn-sm btn-primary" (click)="SubmitSettings()"> Submit</button>
+        </div>
+      </div>
+    </div><!--/.col-->
+</div>

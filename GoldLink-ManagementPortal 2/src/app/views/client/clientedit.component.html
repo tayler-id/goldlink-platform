@@ -1,0 +1,85 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <!--<button type="button" class="btn btn-block btn-link" (click)="gotoView()" title="Click to return to client view" style="position:absolute;width:fit-content;margin-top:-3px;left:-2px;font-size:11px;"><i class='cil-arrow-left c-icon c-icon-3xl c-icon-fix'></i></button>
+            <strong style="margin-left:8px;">Edit Client</strong>-->
+            <strong>Edit Client</strong>
+            <small> </small>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="ccnumber">Name</label>
+                  <input type="text" class="form-control" id="name" placeholder="Enter a client name / unique identifier (only letters/numbers)" maxlength=63 (keyup)="clientnamevalid()">
+                </div>
+              </div>
+            </div><!--/.row-->
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="name">Email</label>
+                  <input type="text" class="form-control" id="email" placeholder="optional: email" maxlength=127 (keyup)="clientemailvalid()">
+                </div>
+              </div>
+            </div><!--/.row-->
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="ccnumber">Address</label>
+                <input type="text" class="form-control" id="address" placeholder="optional: address" maxlength=63>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="ccnumber">Phone</label>
+                <input type="text" class="form-control" id="phone" placeholder="optional: (xxx)xxx-xxxx" maxlength=16>
+              </div>
+              <!--<div class="col-sm-4">
+                <div class="form-group">
+                  <label for="medicarenum">Medicare#</label>
+                  <input type="text" class="form-control" id="medicarenum" placeholder="optional: medicare#" maxlength=12>
+                </div>
+              </div>-->
+            </div><!--/.row-->
+            <div class="row">
+              <div class="col-sm-12">
+                <label for="notes">Notes</label>
+                    <textarea type="text" class="form-control" id="notes" placeholder="optional: notes" maxlength=500></textarea>
+              </div>
+            </div><!--/.row-->
+            <br/><div class="row" *ngIf="getUserData()">
+              <div class="form-group col-sm-10">
+                <label for="jurisdiction">Jurisdiction</label><br/>
+                <select class="form-control" id="jurisdiction" style="display: inline-block;width:80%">
+                  <option value="{{getUserData().compid}}">{{getUserData().compname}}</option>
+                  <option value="1">Private</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Setting a client as 'Private' means administrators of your primary company cannot view this client, because it's independant or information is separate from that company." popoverTitle="" placement="right">?</button>
+              </div>
+            </div><!--/.row-->
+          </div>
+          <div class="card-footer">
+            <strong style="font-size:11px;color:red;" [hidden]="responsetype!=1">Unauthorized</strong>
+            <strong style="font-size:11px;color:red" [hidden]="responsetype!=2">Nothing above was changed.</strong>
+            <strong style="font-size:11px;color:green;" [hidden]="responsetype!=3">Updated successfully!</strong>
+            <strong style="font-size:11px;color:red;" [hidden]="responsetype!=4">Duplicate was found; try to add uniqueness to the name field.</strong>
+            <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+            <button type="submit" class="btn btn-sm btn-primary" [disabled]='!emailisvalid' (click)="EditClient()"> Submit</button>
+            <button type="reset" class="btn btn-sm btn-danger" style="margin-left:6px;" [disabled]='responsetype==4' (click)="SetEditElements()"> Reset</button>
+            <button type="reset" class="btn btn-sm btn-link" style="margin-left:6px;" [disabled]='responsetype==4' (click)="gotoView()"><i class="fa fa-angle-double-left" style="font-size:14px;"> Back</i> </button>
+          </div>
+        </div>
+      </div><!--/.col-->
+  </div>
+
+</div>

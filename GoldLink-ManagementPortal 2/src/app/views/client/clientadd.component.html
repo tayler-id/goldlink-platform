@@ -1,0 +1,72 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <strong>Add Client</strong>
+          <small></small>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="ccnumber">Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter a client name / unique identifier (only letters/numbers)" maxlength=63 (keyup)="clientnamevalid()">
+              </div>
+            </div>
+          </div><!--/.row-->
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="name">Email</label>
+                <input type="text" class="form-control" id="email" placeholder="optional: email" maxlength=127 (keyup)="clientemailvalid()">
+              </div>
+            </div>
+          </div><!--/.row-->
+          <div class="row">
+            <div class="form-group col-sm-6">
+              <label for="ccnumber">Address</label>
+              <input type="text" class="form-control" id="address" placeholder="optional: address" maxlength=63>
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="ccnumber">Phone</label>
+              <input type="text" class="form-control" id="phone" placeholder="optional: (xxx)xxx-xxxx" maxlength=16>
+            </div>
+            <!--<div class="col-sm-4">
+              <div class="form-group">
+                <label for="medicarenum">Medicare#</label>
+                <input type="text" class="form-control" id="medicarenum" placeholder="optional: medicare#" maxlength=12>
+              </div>
+            </div>-->
+          </div><!--/.row-->
+          <div class="row">
+            <div class="col-sm-12">
+              <label for="notes">Notes</label>
+                  <textarea type="text" class="form-control" id="notes" placeholder="optional: notes" maxlength=500></textarea>
+            </div>
+          </div><!--/.row-->
+          <br/><div class="row" *ngIf="getUserData()">
+            <div class="form-group col-sm-10">
+              <label for="jurisdiction">Jurisdiction</label><br/>
+              <select class="form-control" id="jurisdiction" style="display: inline-block;width:80%" (change)="jurisdictionChanged($event)">
+                <option value="">Select..</option>
+                <option value="{{getUserData().compid}}">{{getUserData().compname}}</option>
+                <option value="1">Private</option>
+              </select>
+              <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;position:relative;" popover="Setting a client as 'Private' means administrators of your primary company cannot view this client, because it's independent or information is separate from that company." popoverTitle="" placement="right">?</button>
+            </div>
+          </div><!--/.row-->
+        </div>
+        <div class="card-footer">
+          <strong style="font-size:11px;color:red;" [hidden]="responsetype!=1">Client cannot be added (name probably exists already, try adding additional details if this is a unique client, e.g. middle initials)</strong>
+          <strong style="font-size:11px;" [hidden]="responsetype!=2">Added client</strong>
+          <strong style="font-size:11px;" [hidden]="responsetype!=3">Added client, and sent email</strong>
+          <strong style="font-size:11px;color:red;" [hidden]="responsetype!=5">Client cannot be added (jurisdiction needs to be set)</strong>
+          <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+          <button type="submit" class="btn btn-sm btn-primary" [disabled]='!nameisvalid || !emailisvalid || !jurisdictionisvalid' (click)="CreateClient()"> Add</button>
+          <button type="reset" class="btn btn-sm btn-danger" (click)="ResetForm()" style="margin-left:6px;"> Reset</button>
+          <button type="reset" class="btn btn-sm btn-link" style="margin-left:6px" (click)="gotoClients()"><i class="fa fa-angle-double-left" style="font-size:14px;"> Back</i> </button>
+        </div>
+      </div>
+    </div><!--/.col-->
+</div>

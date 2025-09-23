@@ -1,0 +1,200 @@
+<div [hidden]="isLoaded">
+  <!-- loading visual -->
+  <div style="z-index:9;">
+    <svg class="loader" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle class="internal-circle" cx="60" cy="60" r="30"></circle>
+    </svg>
+  </div>
+</div>
+<div class="animated fadeIn" [hidden]="!isLoaded">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <!--<button type="button" class="btn btn-block btn-link" (click)="gotoView()" title="Click to return to client view" style="position:absolute;width:fit-content;margin-top:-3px;left:-2px;font-size:11px;"><i class='cil-arrow-left c-icon c-icon-3xl c-icon-fix'></i></button>
+            <strong style="margin-left:8px;">Edit Client</strong>-->
+            <strong>Edit User Details</strong>
+            <small> </small>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="fname">First Name</label>
+                  <input type="text" class="form-control" id="fname" placeholder="Firstname" maxlength=32 (keyup)="fnamevalid()">
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="lname">Last Name</label>
+                  <input type="text" class="form-control" id="lname" placeholder="Lastname" maxlength=32 (keyup)="lnamevalid()">
+                </div>
+              </div>
+            </div><!--/.row-->
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label for="name">Email</label>
+                  <input type="text" class="form-control" id="email" placeholder="optional: email" maxlength=127 (keyup)="useremailvalid()">
+                </div>
+                <div class="form-group">
+                  <label for="ccnumber">Phone</label>
+                  <input type="text" class="form-control" id="phone" placeholder="optional: (xxx)xxx-xxxx" maxlength=16>
+                </div>
+              </div>
+            </div><!--/.row-->
+          </div>
+          <div class="card-footer">
+            <strong style="font-size:11px;color:red;" [hidden]="responsetype!=1">Unauthorized</strong>
+            <strong style="font-size:11px;" [hidden]="responsetype!=2">Nothing was changed.</strong>
+            <strong style="font-size:11px;color:green;" [hidden]="responsetype!=3">Updated successfully!</strong>
+            <strong style="font-size:11px;color:red;" [hidden]="responsetype!=4">Duplicate name or data was found; try a unique name.</strong>
+            <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+            <button type="submit" class="btn btn-sm btn-primary" [disabled]='!lnamevalid || !emailisvalid || !fnamevalid' (click)="EditUser()"> Submit</button>
+            <button type="reset" style="margin-left:10px" class="btn btn-sm btn-danger" [disabled]='responsetype==4' (click)="SetEditElements()"> Reset</button>
+          </div>
+        </div>
+
+        <div class="card" [hidden]="!settingsresponsetype">
+          <div class="card-header">
+            <strong>Settings</strong>
+            <small> </small>
+          </div>
+          <div class="card-body">
+
+            <div class="row">
+              <div class="form-group col-sm-10">
+                <label for="2fa">Theme Selection</label><br/>
+                <select class="form-control" id="themeselect" style="display: inline-block;width:93%" (change)="themeSelectChanged($event)">
+                  <option value="-16">Alpine White</option>
+                  <option value="16">Professional Blue</option>
+                  <option value="32">Radiant Gold</option>
+                  <option value="64">Black Gold</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Theme selection allows you to personalize your page appearance." popoverTitle="" placement="right">?</button>
+              </div>
+            </div><!--/.row-->
+            <hr/>
+              
+             <div class="row">
+                <div class="form-group col-sm-10">
+                  <label for="2fa">2 Factor Authentication</label><br/>
+                  <select class="form-control" id="2fa" style="display: inline-block;width:93%" (change)="twoFactorAuthChanged($event)">
+                    <option value="0">Off</option>
+                    <option value="2" [hidden]="!user.email">via Email</option>
+                    <option value="4" [hidden]="!user.phone">via Phone</option>
+                    <option value="6" [hidden]="!user.phone || !user.email">via Phone + Email</option>
+                  </select>
+                  <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="2FA ensures account security and HIPPA compliance by sending a verification code via texting or email. Having 2FA versus not having it mitigates 95-99% of phishing and security issues." popoverTitle="" placement="right">?</button>
+                </div>
+              </div><!--/.row-->
+
+            <hr/>
+
+            <div class="row">
+              <div class="form-group col-sm-5">
+                <label for="pagination">Pagination</label><br/>
+                <select class="form-control" id="pagination" style="display: inline-block;width:93%" (change)="paginationSelectChanged($event)">
+                  <option value="-128">Off</option>
+                  <option value="128">On</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Theme selection allows you to personalize your page appearance." popoverTitle="" placement="right">?</button>
+              </div>
+              <div class="form-group col-sm-4" id="pagelimitformgroup" style="display:none;">
+                <label for="pagelimit">Page Limit</label><br/>
+                <select class="form-control" id="pagelimit" style="display: inline-block;width:93%" (change)="pagelimitSelectChanged($event)">
+                  <option value="5">5</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="75">75</option>
+                  <option value="100">100</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Theme selection allows you to personalize your page appearance." popoverTitle="" placement="right">?</button>
+              </div>
+            </div><!--/.row-->
+            <hr/>
+
+            <div class="row">
+              <div class="form-group col-sm-10">
+                <label for="2fa">Auto Updating</label><br/>
+                <select class="form-control" id="autoupdate" style="display: inline-block;width:93%" (change)="autoUpdateChanged($event)">
+                  <option value="-8">Off - App will only manually update</option>
+                  <option value="8">On - App will apply updates on startup</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Auto-updating will check the version and ensure you have loaded the latest page features/version (not a cached version). Not updating may be beneficial in slow network connections." popoverTitle="" placement="right">?</button>
+              </div>
+            </div><!--/.row-->
+            <p><b>Your Version</b>: <i>{{getLocalVersion()}}</i>
+            <p *ngIf="!settings.version">Retrieving latest version info from the server.</p>
+            <p *ngIf="settings.version"><b>Remote Version</b>: <i>{{settings.version}}</i>
+            <p *ngIf="settings.version && getLocalVersion() < settings.version">Your version is out-of-date. <a href="#" (click)="updateApp()">Click here to update.</a></p>
+            <p *ngIf="settings.version && getLocalVersion() == settings.version">Your version is up-to-date.</p>
+          </div>
+
+        </div>
+
+        <div class="card" [hidden]="!settingsresponsetype">
+          <div class="card-header">
+            <strong>Timezone Settings</strong>
+            <small> </small>
+          </div>
+          <div class="card-body">
+
+            <div class="row">
+              <div class="form-group col-sm-10">
+                <label for="timezoneselect">Timezone</label><br/>
+                <select class="form-control" id="timezoneselect" style="display: inline-block;width:93%" (change)="EditUserTimezone($event)">
+                  <option value="255">Auto-Determined</option>
+                  <option value="-12">(GMT -12:00) Eniwetok, Kwajalein</option>
+                  <option value="-11">(GMT -11:00) Midway Island, Samoa</option>
+                  <option value="-10">(GMT -10:00) Hawaii</option>
+                  <option value="-9">(GMT -9:30) Taiohae</option>
+                  <option value="-9">(GMT -9:00) Alaska</option>
+                  <option value="-8">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                  <option value="-7">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                  <option value="-6">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                  <option value="-5">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                  <option value="-4">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                  <option value="-3">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                  <option value="-2">(GMT -2:00) Mid-Atlantic</option>
+                  <option value="-1">(GMT -1:00) Azores, Cape Verde Islands</option>
+                  <option value="0">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                  <option value="1">(GMT +1:00) Brussels, Copenhagen, Madrid, Paris</option>
+                  <option value="2">(GMT +2:00) Kaliningrad, South Africa</option>
+                  <option value="3">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                  <option value="4">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                  <option value="5">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                  <option value="6">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                  <option value="7">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                  <option value="8">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                  <option value="8">(GMT +8:45) Eucla</option>
+                  <option value="9">(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+                  <option value="10">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                  <option value="11">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                  <option value="12">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                  <option value="13">(GMT +13:00) Apia, Nukualofa</option>
+                  <option value="14">(GMT +14:00) Line Islands, Tokelau</option>
+                </select>
+                <button type="button" class="btn btn-default" style="display: inline-block;width:30px;height:32px;margin-bottom:5px;font-size:12px;" popover="Timezone selection allows overriding your timezone, mostly useful for scheduling." popoverTitle="" placement="right">?</button>
+                <br/>
+                <strong style="font-size:11px;color:red;" [hidden]="tzresponsetype!=1">Unauthorized</strong>
+                <strong style="font-size:11px;" [hidden]="tzresponsetype!=2">Nothing was changed.</strong>
+                <strong style="font-size:11px;color:green;" [hidden]="tzresponsetype!=3">Updated successfully!</strong>
+                <strong style="font-size:11px;color:red;" [hidden]="tzresponsetype!=4">Nothing was changed.</strong>
+                <br [hidden]="responsetype==0"><br [hidden]="responsetype==0">
+              </div>
+            </div><!--/.row-->
+            <p><b>Your Timezone</b>: <i>{{getTimezoneString().str}} <span *ngIf="getTimezoneString().dls" style="display:inline-block;font-size:12px;">&nbsp;(Daylight savings time is in effect)</span></i>
+              <p *ngIf="user.tzOffset == 255">Your time-zone is being automatically determined by your browser and internet connection. </p>
+              <p *ngIf="user.tzOffset != 255">Your time-zone has been manually set. </p>
+            <hr/>
+              
+
+        </div>
+
+
+      </div><!--/.col-->
+    </div>
+  </div>
+</div>
