@@ -736,8 +736,8 @@ useEffect(() => {
 
             {/* Local Video (Self/Therapist) - Picture-in-Picture */}
             <div
-              className={`absolute bottom-32 w-1/3 max-w-sm video-container-borderless rounded-lg overflow-hidden shadow-2xl z-40 ${
-                isDetailsPanelOpen ? 'right-[400px]' : 'right-6'
+              className={`absolute bottom-32 w-2/5 md:w-1/3 max-w-[200px] md:max-w-sm video-container-borderless rounded-lg overflow-hidden shadow-2xl z-40 right-4 md:right-6 ${
+                isDetailsPanelOpen ? 'md:right-[400px]' : ''
               }`}
               style={{ transition: 'all 0.4s ease-in-out' }}
             >
