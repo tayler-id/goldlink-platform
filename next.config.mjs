@@ -9,6 +9,28 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+
+  // Proxy API requests to backend server
+  async rewrites() {
+    return [
+      {
+        source: '/bmapi/:path*',
+        destination: 'https://localhost:3005/bmapi/:path*',
+      },
+      {
+        source: '/socket.io/:path*',
+        destination: 'https://localhost:3005/socket.io/:path*',
+      },
+    ];
+  },
+
+  // Allow self-signed certificates in development
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+    return config;
+  },
 }
 
 export default nextConfig
