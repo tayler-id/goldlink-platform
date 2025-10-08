@@ -138,21 +138,34 @@ export default function Page({ params }: { params: { roomId: string } }) {
 
   // ---------- Effects ----------
   useEffect(() => {
-    // Skip loader for now to test video functionality
-    setIsLoading(false);
-    // const t = setTimeout(() => setIsLoading(false), 7000); // Fallback timeout for Three.js animation (5s + buffer)
-    // return () => clearTimeout(t);
+    // Fallback: if animation doesn't complete, skip it after 5 seconds
+    const fallbackTimeout = setTimeout(() => {
+      console.log('⏰ Animation timeout - skipping to main UI');
+      setIsLoading(false);
+    }, 5000);
+
+    return () => clearTimeout(fallbackTimeout);
   }, []);
 
-  // left/right padding when side panels open
+  // Initialize session ONLY after loading completes
   useEffect(() => {
-    const mainEl = mainContentRef.current;
-    if (!mainEl) return;
-    const panelWidth = 380;
-    const mainPadding = 32;
-    mainEl.style.paddingLeft = isChatPanelOpen ? `${panelWidth + mainPadding}px` : `${mainPadding}px`;
-    mainEl.style.paddingRight = isDetailsPanelOpen ? `${panelWidth + mainPadding}px` : `${mainPadding}px`;
-  }, [isChatPanelOpen, isDetailsPanelOpen]);
+    if (!isLoading) {
+      console.log('🚀 Loading complete, initializing session...');
+      initializeSession();
+    }
+  }, [isLoading]);
+
+  // Cleanup only on unmount
+  useEffect(() => {
+    return () => {
+      console.log('🧹 Component unmounting, cleaning up...');
+      webrtcManager.cleanup();
+      socketManager.disconnect();
+    };
+  }, []);
+
+  // Panels now overlay the video instead of pushing it
+  // (removed padding adjustment effect)
 
 // Lift main content and PiP exactly above the footer height
 useEffect(() => {
@@ -196,21 +209,6 @@ useEffect(() => {
   }, [timerIsRunning]);
 
   // ---------- WebRTC Initialization ----------
-  useEffect(() => {
-    let isSubscribed = true;
-
-    if (isSubscribed) {
-      initializeSession();
-    }
-
-    return () => {
-      // Cleanup on unmount
-      isSubscribed = false;
-      webrtcManager.cleanup();
-      socketManager.disconnect();
-    };
-  }, []); // Run once on mount
-
   async function initializeSession() {
     try {
       // Get room ID from Next.js params
@@ -238,11 +236,11 @@ useEffect(() => {
         console.log('✅ Local video ref set');
       }
 
-      // 2. Connect Socket.io
+      // 2. Connect Socket.io and wait for connection
       // Note: Will use "Loading..." initially, but will be updated when session data loads
-      socketManager.connect(therapistName);
+      await socketManager.connect(therapistName);
 
-      // 3. Subscribe to room
+      // 3. Subscribe to room (socket.id is now available)
       socketManager.subscribeToRoom(roomIdFromParams, therapistName);
 
       // 4. Set up Socket.io event listeners
@@ -737,7 +735,12 @@ useEffect(() => {
             </div>
 
             {/* Local Video (Self/Therapist) - Picture-in-Picture */}
-            <div className="absolute bottom-5 right-4 w-1/4 max-w-xs video-container-borderless rounded-lg overflow-hidden">
+            <div
+              className={`absolute bottom-32 w-1/3 max-w-sm video-container-borderless rounded-lg overflow-hidden shadow-2xl z-40 ${
+                isDetailsPanelOpen ? 'right-[400px]' : 'right-6'
+              }`}
+              style={{ transition: 'all 0.4s ease-in-out' }}
+            >
               <video
                 ref={localVideoRef}
                 autoPlay
@@ -816,15 +819,6 @@ useEffect(() => {
             <span className="font-orbitron text-[10px] tracking-wider">TIMER</span>
           </button>
 
-          {/* CPT Codes */}
-          <button
-            onClick={() => setActiveModal("book")}
-            className="glass-control-button flex flex-col items-center justify-center gap-2"
-          >
-            <BookOpen className="w-6 h-6" />
-            <span className="font-orbitron text-[10px] tracking-wider">CPT</span>
-          </button>
-
           {/* Details */}
           <button
             onClick={() => setIsDetailsPanelOpen(true)}
@@ -834,39 +828,6 @@ useEffect(() => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <span className="font-orbitron text-[10px] tracking-wider">DETAILS</span>
-          </button>
-
-          {/* Calendar */}
-          <button
-            onClick={() => setActiveModal("calendar")}
-            className="glass-control-button flex flex-col items-center justify-center gap-2"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span className="font-orbitron text-[10px] tracking-wider">CAL</span>
-          </button>
-
-          {/* Refresh */}
-          <button
-            onClick={() => window.location.reload()}
-            className="glass-control-button flex flex-col items-center justify-center gap-2"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" />
-            </svg>
-            <span className="font-orbitron text-[10px] tracking-wider">RELOAD</span>
-          </button>
-
-          {/* Share */}
-          <button
-            onClick={() => setActiveModal("share")}
-            className="glass-control-button flex flex-col items-center justify-center gap-2"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
-            <span className="font-orbitron text-[10px] tracking-wider">SHARE</span>
           </button>
 
           {/* End Call */}
@@ -999,6 +960,54 @@ useEffect(() => {
             ) : (
               <div dangerouslySetInnerHTML={{ __html: aiSummary }} />
             )}
+          </div>
+        </div>
+
+        {/* Additional Actions */}
+        <div className="mt-6 border-t border-gray-700 pt-6 pb-4">
+          <h3 className="text-xl font-bold font-orbitron text-gold mb-6">Actions</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {/* CPT Codes */}
+            <button
+              onClick={() => setActiveModal("book")}
+              className="glass-control-button flex flex-col items-center justify-center gap-2"
+            >
+              <BookOpen className="w-6 h-6" />
+              <span className="font-orbitron text-[10px] tracking-wider">CPT</span>
+            </button>
+
+            {/* Calendar */}
+            <button
+              onClick={() => setActiveModal("calendar")}
+              className="glass-control-button flex flex-col items-center justify-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="font-orbitron text-[10px] tracking-wider">CAL</span>
+            </button>
+
+            {/* Share */}
+            <button
+              onClick={() => setActiveModal("share")}
+              className="glass-control-button flex flex-col items-center justify-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <span className="font-orbitron text-[10px] tracking-wider">SHARE</span>
+            </button>
+
+            {/* Reload */}
+            <button
+              onClick={() => window.location.reload()}
+              className="glass-control-button flex flex-col items-center justify-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" />
+              </svg>
+              <span className="font-orbitron text-[10px] tracking-wider">RELOAD</span>
+            </button>
           </div>
         </div>
       </aside>

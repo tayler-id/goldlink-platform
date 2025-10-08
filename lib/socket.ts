@@ -13,9 +13,9 @@ class SocketManager {
   private socketId: string | null = null;
 
   /**
-   * Initialize socket connection
+   * Initialize socket connection and wait for it to be ready
    */
-  connect(userName?: string): Socket {
+  async connect(userName?: string): Promise<Socket> {
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -26,9 +26,13 @@ class SocketManager {
       rejectUnauthorized: false, // Allow self-signed certs
     });
 
-    this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id);
-      this.socketId = this.socket?.id || null;
+    // Wait for connection to establish
+    await new Promise<void>((resolve) => {
+      this.socket!.on('connect', () => {
+        console.log('Socket connected:', this.socket?.id);
+        this.socketId = this.socket?.id || null;
+        resolve();
+      });
     });
 
     this.socket.on('disconnect', (reason) => {
