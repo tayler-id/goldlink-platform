@@ -527,6 +527,29 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Earthen Gold Palette for Tailwind */
+  --color-gold-darkest: #5E4818;
+  --color-gold-darker: #7A5E20;
+  --color-gold-dark: #96762F;
+  --color-gold: #BA984F;
+  --color-gold-light: #D4B878;
+  --color-gold-lightest: #E8D5A8;
+
+  --color-black-pure: #010302;
+  --color-black-soft: #0A0A08;
+  --color-black-warm: #121210;
+  --color-gray-darkest: #1A1A16;
+  --color-gray-dark: #2A2A22;
+  --color-gray-medium: #3A3A2E;
+  --color-gray-light: #4A4A3A;
+  --color-gray-lighter: #6A6A56;
+
+  /* Shadow utilities */
+  --shadow-sm: 0 1px 2px 0 rgba(186, 152, 79, 0.05), 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 4px -1px rgba(186, 152, 79, 0.08), 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 8px -2px rgba(186, 152, 79, 0.12), 0 8px 16px 0 rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 8px 16px -4px rgba(186, 152, 79, 0.15), 0 12px 24px 0 rgba(0, 0, 0, 0.7);
 }
 
 /* Tailwind base tweaks */
@@ -537,35 +560,350 @@
 
 /* ===== GOLDLINK page-specific variables & styles ===== */
 
-/* Brand palette used by the video UI + book */
+/* ===== EARTHEN GOLD BRAND PALETTE ===== */
 :root {
-  --dark-blue: #0A0F1E;
-  --panel-blue-solid: #111827;
-  --panel-blue-transparent: rgba(17, 24, 39, 0.8);
-  --gold: #FBBF24;
-  --gold-glow: #FBBF2480;
-  --light-blue: #60A5FA;
+  /* Gold Variants - Layered System (Based on #BA984F) */
+  --gold-darkest: #5E4818;           /* L1: Deep brown - shadows, deepest layers */
+  --gold-darker: #7A5E20;            /* L2: Darkened gold */
+  --gold-dark: #96762F;              /* L3: Medium gold */
+  --gold: #BA984F;                   /* L4: BASE warm gold */
+  --gold-light: #D4B878;             /* L5: Light gold highlights */
+  --gold-lightest: #E8D5A8;          /* L6: Brightest accents */
+  --gold-glow: rgba(186, 152, 79, 0.6);  /* Warm glow effect */
+
+  /* Black/Gray Variants - Layered System (Based on #010302) */
+  --black-pure: #010302;             /* L1: True black - app background */
+  --black-soft: #0A0A08;             /* L2: Slightly elevated black */
+  --black-warm: #121210;             /* L3: Warm black */
+  --gray-darkest: #1A1A16;           /* L4: Dark gray-brown - panels */
+  --gray-dark: #2A2A22;              /* L5: Gray-brown - elevated panels */
+  --gray-medium: #3A3A2E;            /* L6: Medium gray - borders */
+  --gray-light: #4A4A3A;             /* L7: Light gray - text */
+  --gray-lighter: #6A6A56;           /* L8: Lighter gray - secondary text */
+
+  /* Legacy Compatibility (map old names to new) */
+  --dark-blue: var(--gray-darkest);            /* Backward compat */
+  --panel-blue-solid: var(--gray-dark);        /* Backward compat */
+  --panel-blue-transparent: rgba(26, 26, 22, 0.8);  /* Warm dark transparent */
+
+  /* Semantic Colors */
+  --success-dark: #065F46;
+  --success: #10B981;
+  --success-light: #34D399;
+
+  --error-dark: #991B1B;
+  --error: #EF4444;
+  --error-light: #F87171;
+
+  --warning-dark: #92400E;
+  --warning: #F59E0B;
+  --warning-light: #FBBF24;
+
+  /* Shadow System - Dual Layer (Light + Dark) */
+  --shadow-sm:
+    0 1px 2px 0 rgba(186, 152, 79, 0.05),
+    0 2px 4px 0 rgba(0, 0, 0, 0.4);
+
+  --shadow-md:
+    0 2px 4px -1px rgba(186, 152, 79, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.5);
+
+  --shadow-lg:
+    0 4px 8px -2px rgba(186, 152, 79, 0.12),
+    0 8px 16px 0 rgba(0, 0, 0, 0.6);
+
+  --shadow-xl:
+    0 8px 16px -4px rgba(186, 152, 79, 0.15),
+    0 12px 24px 0 rgba(0, 0, 0, 0.7);
+
+  --shadow-gold-glow:
+    0 0 20px rgba(186, 152, 79, 0.4),
+    0 4px 8px 0 rgba(0, 0, 0, 0.5);
+
+  --shadow-inset:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.6),
+    inset 0 -1px 2px 0 rgba(186, 152, 79, 0.05);
+
+  --shadow-elevated:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+    0 2px 4px -1px rgba(186, 152, 79, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* Base page look */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--dark-blue);
-  color: white;
+  background: linear-gradient(
+    180deg,
+    var(--black-pure) 0%,
+    var(--black-soft) 50%,
+    var(--black-warm) 100%
+  );
+  color: #FFFFFF;
   overflow: hidden;
+  min-height: 100vh;
 }
 
-/* Utility classes used by the page */
+/* ===== UTILITY CLASSES - Earthen Gold System ===== */
+
+/* Typography */
 .font-orbitron { font-family: 'Orbitron', sans-serif; }
 .text-gold { color: var(--gold); }
-.text-gold\/70 { color: rgba(251, 191, 36, 0.7); }
+.text-gold-light { color: var(--gold-light); }
+.text-gold-lightest { color: var(--gold-lightest); }
+.text-gold-dark { color: var(--gold-dark); }
 
-/* Frosted glass panels */
+/* Frosted glass panels - BORDERLESS with 3-LAYER shadows */
 .frosted-glass {
-  background-color: rgba(17, 24, 39, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 2px solid var(--gold);
+  background: linear-gradient(
+    180deg,
+    rgba(58, 58, 46, 0.6) 0%,          /* Lighter top */
+    rgba(42, 42, 34, 0.55) 50%,        /* Middle transition */
+    rgba(26, 26, 22, 0.5) 100%         /* Darker bottom */
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* 3-LAYER SHADOW SYSTEM - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.12),        /* Layer 1: Inner top highlight */
+    0 2px 4px rgba(186, 152, 79, 0.1),             /* Layer 2: Gold glow */
+    0 4px 8px rgba(0, 0, 0, 0.6),                  /* Layer 3: Dark depth */
+    0 8px 16px rgba(0, 0, 0, 0.4);                 /* Layer 3B: Extended depth */
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.frosted-glass:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(74, 74, 58, 0.7) 0%,          /* Lighter elevated top */
+    rgba(58, 58, 46, 0.65) 50%,        /* Middle */
+    rgba(42, 42, 34, 0.6) 100%         /* Bottom */
+  );
+
+  /* Elevated 3-layer shadow - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.2),         /* Layer 1: Brighter highlight */
+    0 4px 8px rgba(186, 152, 79, 0.15),            /* Layer 2: Stronger glow */
+    0 8px 16px rgba(0, 0, 0, 0.7),                 /* Layer 3: Deeper shadow */
+    0 16px 32px rgba(0, 0, 0, 0.5);                /* Layer 3B: Extended depth */
+}
+
+/* Premium Card - BORDERLESS with layered shadows */
+.premium-card {
+  background: linear-gradient(
+    180deg,
+    var(--gray-darkest) 0%,
+    var(--black-warm) 100%
+  );
+  border-radius: 16px;
+  padding: 2rem;
+
+  /* NO BORDER - Dual shadow for depth */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.08),
+    0 2px 4px -1px rgba(186, 152, 79, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.5);
+
+  transition: all 0.3s ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+
+  /* Elevated shadow - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.12),
+    0 4px 8px -2px rgba(186, 152, 79, 0.12),
+    0 8px 16px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Featured Card - Glowing Border (Like Pricing Example) */
+.premium-card-featured {
+  background: linear-gradient(
+    180deg,
+    var(--black-warm) 0%,
+    var(--black-soft) 100%
+  );
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  border: 2px solid rgba(186, 152, 79, 0.5);
+
+  /* Dual shadow with gold glow */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.2),
+    0 0 0 2px rgba(186, 152, 79, 0.3),
+    0 0 24px rgba(186, 152, 79, 0.4),
+    0 0 48px rgba(186, 152, 79, 0.2),
+    0 12px 24px rgba(0, 0, 0, 0.8),
+    0 16px 32px rgba(0, 0, 0, 0.6);
+
+  transform: translateY(-8px) scale(1.02);
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== BUTTON SYSTEM - BORDERLESS ===== */
+
+/* Primary Button - Solid Gold with 3-LAYER SHADOW */
+.btn-primary {
+  background: linear-gradient(
+    180deg,
+    var(--gold-lightest) 0%,      /* Bright top */
+    var(--gold-light) 25%,        /* Light transition */
+    var(--gold) 60%,              /* Base middle */
+    var(--gold-dark) 100%         /* Dark bottom */
+  );
+  color: var(--black-pure);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  /* 3-LAYER SHADOW - Shiny premium button */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),        /* Layer 1: Top shine */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),             /* Layer 1B: Bottom depth */
+    0 2px 4px rgba(186, 152, 79, 0.4),             /* Layer 2: Gold glow */
+    0 4px 8px rgba(0, 0, 0, 0.6),                  /* Layer 3: Dark depth */
+    0 8px 16px rgba(0, 0, 0, 0.4);                 /* Layer 3B: Extended depth */
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),        /* Brighter shine */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(186, 152, 79, 0.5),             /* Stronger glow */
+    0 8px 16px rgba(0, 0, 0, 0.7),                 /* Deeper shadow */
+    0 16px 32px rgba(0, 0, 0, 0.5);                /* Extended depth */
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  background: linear-gradient(
+    180deg,
+    var(--gold-dark) 0%,          /* Inverted - dark on top */
+    var(--gold) 40%,
+    var(--gold-light) 75%,
+    var(--gold-lightest) 100%     /* Light bottom */
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),            /* Pressed in */
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Secondary Button - Dark with gold tint NO BORDER */
+.btn-secondary {
+  background: linear-gradient(
+    180deg,
+    rgba(186, 152, 79, 0.15) 0%,
+    rgba(186, 152, 79, 0.08) 100%
+  );
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  /* Dual shadow instead of border */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(186, 152, 79, 0.25) 0%,
+    rgba(186, 152, 79, 0.15) 100%
+  );
+
+  /* Elevated shadow - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.2),
+    0 4px 8px rgba(186, 152, 79, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Panel Button - Control Panel Style with 3-LAYER SHADOW */
+.panel-button {
+  background: linear-gradient(
+    180deg,
+    var(--gray-medium) 0%,        /* Lighter top */
+    var(--gray-dark) 50%,         /* Middle transition */
+    var(--gray-darkest) 100%      /* Darker bottom */
+  );
+  border: none;
+  color: var(--gold-light);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+
+  /* 3-LAYER SHADOW SYSTEM */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.12),       /* Layer 1: Top highlight */
+    0 1px 2px rgba(186, 152, 79, 0.08),           /* Layer 2: Gold glow */
+    0 2px 4px rgba(0, 0, 0, 0.5),                 /* Layer 3: Dark depth */
+    0 4px 8px rgba(0, 0, 0, 0.3);                 /* Layer 3B: Extended depth */
+
+  transition: all 0.2s ease;
+}
+
+.panel-button:hover {
+  background: linear-gradient(
+    180deg,
+    var(--gray-light) 0%,         /* Even lighter on hover */
+    var(--gray-medium) 50%,
+    var(--gray-dark) 100%
+  );
+
+  /* Enhanced 3-layer shadow - Gold glow */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.2),        /* Brighter highlight */
+    0 2px 4px rgba(186, 152, 79, 0.25),           /* Stronger gold glow */
+    0 4px 8px rgba(0, 0, 0, 0.6),                 /* Deeper shadow */
+    0 8px 16px rgba(0, 0, 0, 0.4);                /* Extended depth */
+
+  transform: translateY(-1px);
+}
+
+.panel-button:active {
+  transform: translateY(0);
+  background: linear-gradient(
+    180deg,
+    var(--gray-darkest) 0%,       /* Inverted - dark on top */
+    var(--gray-dark) 50%,
+    var(--gray-medium) 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),           /* Pressed in */
+    inset 0 -1px 0 rgba(186, 152, 79, 0.08);
+}
+
+/* Embossed Text Effect */
+.text-embossed-gold {
+  color: var(--gold-lightest);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-shadow:
+    0 0 20px rgba(186, 152, 79, 0.8),
+    0 2px 0 var(--gold-darkest),
+    0 4px 0 var(--gold-darker),
+    0 6px 10px rgba(0, 0, 0, 0.9);
+  filter: drop-shadow(0 0 15px rgba(186, 152, 79, 0.6));
 }
 
 /* Logo draw-in animation */
@@ -578,96 +916,235 @@ body {
 
 .loading-screen { transition: opacity 0.5s ease-out; }
 
-/* ===== Control panel (bottom) ===== */
-/* ===== Control panel (bottom) ===== */
-.control-panel {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transform: translateY(calc(100% - 30px));
-  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  z-index: 30;
-}
+/* ===== CONTROL BUTTONS - Frosted Glass Individual Buttons ===== */
 
-.control-panel-body {
-  background-color: var(--panel-blue-transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 2px solid var(--gold);
-}
-
-/* only the panel slides up */
-.control-panel.panel-open {
-  transform: translateY(0) !important;
-  animation: none !important;
-}
-
-.panel-handle-tab {
-  position: absolute;
-  top: -30px;
+/* Container for control buttons */
+.control-buttons-container {
+  position: fixed;
+  bottom: 2rem;
   left: 50%;
-  transform: translateX(-50%); /* always centered */
-  width: 120px;
-  height: 30px;
-  background-color: var(--panel-blue-transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 2px solid var(--gold);
-  border-bottom: none;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  cursor: pointer;
+  transform: translateX(-50%);
   display: flex;
+  gap: 1rem;
+  z-index: 30;
+  padding: 0 2rem;
+}
+
+/* Individual Glass Button */
+.glass-control-button {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--gold);
+  gap: 0.5rem;
+  cursor: pointer;
+
+  /* Frosted Glass Effect */
+  background: linear-gradient(
+    135deg,
+    rgba(58, 58, 46, 0.7) 0%,
+    rgba(42, 42, 34, 0.6) 50%,
+    rgba(26, 26, 22, 0.5) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+
+  /* 3-LAYER SHADOW - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.15),      /* Layer 1: Top highlight */
+    0 2px 4px rgba(186, 152, 79, 0.12),          /* Layer 2: Gold glow */
+    0 4px 8px rgba(0, 0, 0, 0.6),                /* Layer 3: Dark depth */
+    0 8px 16px rgba(0, 0, 0, 0.4);               /* Layer 3B: Extended depth */
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Stagger Animation - Whip in from bottom */
+  opacity: 0;
+  transform: translateY(100px) scale(0.8);
+  animation: whipIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger delays for each button */
+.glass-control-button:nth-child(1) { animation-delay: 0s; }
+.glass-control-button:nth-child(2) { animation-delay: 0.08s; }
+.glass-control-button:nth-child(3) { animation-delay: 0.16s; }
+.glass-control-button:nth-child(4) { animation-delay: 0.24s; }
+.glass-control-button:nth-child(5) { animation-delay: 0.32s; }
+.glass-control-button:nth-child(6) { animation-delay: 0.4s; }
+.glass-control-button:nth-child(7) { animation-delay: 0.48s; }
+.glass-control-button:nth-child(8) { animation-delay: 0.56s; }
+
+/* Whip In Animation */
+@keyframes whipIn {
+  0% {
+    opacity: 0;
+    transform: translateY(100px) scale(0.8) rotate(-5deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.05) rotate(2deg);
+  }
+  80% {
+    transform: translateY(5px) scale(0.98) rotate(-1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+/* Hover State - Elevated Glass */
+.glass-control-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 74, 58, 0.8) 0%,
+    rgba(58, 58, 46, 0.7) 50%,
+    rgba(42, 42, 34, 0.6) 100%
+  );
+
+  /* Enhanced 3-layer shadow */
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.25),
+    0 4px 8px rgba(186, 152, 79, 0.2),
+    0 8px 16px rgba(0, 0, 0, 0.7),
+    0 16px 32px rgba(0, 0, 0, 0.5);
+
+  transform: translateY(-4px) scale(1.05);
+}
+
+/* Active/Pressed State */
+.glass-control-button:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(186, 152, 79, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Icon Styling */
+.glass-control-button svg {
+  width: 24px;
+  height: 24px;
+  color: var(--gold-light);
   transition: all 0.3s ease;
 }
 
-.panel-handle-tab:hover {
-  transform: translateX(-50%) translateY(-2px); /* stays centered */
-  box-shadow: 0 0 15px var(--gold-glow);
-  background-color: rgba(17, 24, 39, 0.9);
+.glass-control-button:hover svg {
+  color: var(--gold-lightest);
+  transform: scale(1.1);
 }
 
-/* gentle bounce when closed */
-.control-panel:not(.panel-open) {
-  animation: panel-gentle-bounce 4s ease-in-out infinite;
+/* Label Styling */
+.glass-control-button span {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  text-transform: uppercase;
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
-.control-panel:not(.panel-open):hover {
-  animation-play-state: paused;
+.glass-control-button:hover span {
+  color: var(--gold-lightest);
 }
 
-@keyframes panel-gentle-bounce {
-  0%   { transform: translateY(calc(100% - 30px)); }
-  8%   { transform: translateY(calc(100% - 32px)); }
-  16%  { transform: translateY(calc(100% - 30px)); }
-  100% { transform: translateY(calc(100% - 30px)); }
+/* Active Button State (when panel is open) */
+.glass-control-button.active {
+  background: linear-gradient(
+    135deg,
+    rgba(186, 152, 79, 0.3) 0%,
+    rgba(186, 152, 79, 0.2) 50%,
+    rgba(186, 152, 79, 0.15) 100%
+  );
+
+  box-shadow:
+    inset 0 0 0 2px rgba(186, 152, 79, 0.4),
+    inset 0 1px 0 rgba(186, 152, 79, 0.3),
+    0 4px 8px rgba(186, 152, 79, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+.glass-control-button.active svg,
+.glass-control-button.active span {
+  color: var(--gold-lightest);
+}
+
+/* End Call Button - Red Glass */
+.glass-control-button.end-call {
+  background: linear-gradient(
+    135deg,
+    rgba(185, 28, 28, 0.7) 0%,
+    rgba(153, 27, 27, 0.6) 50%,
+    rgba(127, 29, 29, 0.5) 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(248, 113, 113, 0.2),
+    0 2px 4px rgba(239, 68, 68, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.glass-control-button.end-call:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.8) 0%,
+    rgba(185, 28, 28, 0.7) 50%,
+    rgba(153, 27, 27, 0.6) 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(248, 113, 113, 0.3),
+    0 4px 8px rgba(239, 68, 68, 0.5),
+    0 8px 16px rgba(0, 0, 0, 0.7),
+    0 16px 32px rgba(0, 0, 0, 0.5);
 }
 
 
-/* Buttons in the control panel */
-.panel-button {
-  position: relative;
-  background-color: #374151;
-  border: 1px solid #4b5563;
-  transition: all 0.2s ease-in-out;
-  transform-style: preserve-3d;
-}
-.panel-button:hover {
-  background-color: #4b5563;
-  border-color: var(--gold);
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px var(--gold-glow);
-}
+/* Buttons in the control panel - BORDERLESS (uses definition above at line 832) */
 .panel-button:disabled {
-  opacity: 0.5; cursor: not-allowed; transform: translateY(0); box-shadow: none;
-  background-color: #374151; border-color: #4b5563;
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+  background: linear-gradient(
+    180deg,
+    var(--gray-darkest) 0%,
+    var(--black-warm) 100%
+  );
 }
-.panel-button.end-call { background-color: #991B1B; border-color: #F87171; }
-.panel-button.end-call:hover { background-color: #B91C1C; border-color: #F87171; box-shadow: 0 0 15px #F8717180; }
+
+.panel-button.end-call {
+  background: linear-gradient(
+    180deg,
+    #B91C1C 0%,
+    #991B1B 100%
+  );
+  /* NO BORDER - Shadow only */
+  box-shadow:
+    inset 0 1px 0 rgba(248, 113, 113, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.panel-button.end-call:hover {
+  background: linear-gradient(
+    180deg,
+    #DC2626 0%,
+    #B91C1C 100%
+  );
+  /* Red glow - NO BORDER */
+  box-shadow:
+    inset 0 1px 0 rgba(248, 113, 113, 0.3),
+    0 0 20px rgba(248, 113, 113, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
+}
 
 /* ===== Modals ===== */
 .modal-container { transition: opacity 0.3s ease-in-out; }
@@ -759,16 +1236,59 @@ body {
 }
 #hour-display { fill: var(--gold); font-size: 20px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 5px var(--gold-glow); }
 
-/* ===== Side panels (chat/details) ===== */
+/* ===== Side panels (chat/details) - BORDERLESS ===== */
 .side-panel {
-  position: fixed; top: 0; height: 100%; width: 380px;
-  transition: transform 0.4s ease-in-out; z-index: 35;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 380px;
+  transition: transform 0.4s ease-in-out;
+  z-index: 35;
 }
-#details-panel { right: 0; border-left: 2px solid var(--gold); transform: translateX(100%); }
-#details-panel.panel-open { transform: translateX(0); }
-#chat-panel { left: 0; border-right: 2px solid var(--gold); transform: translateX(-100%); }
-#chat-panel.panel-open { transform: translateX(0); }
-.detail-item { border-bottom: 1px solid #374151; }
+
+/* Details Panel - 3-LAYER SHADOW on left edge */
+#details-panel {
+  right: 0;
+  transform: translateX(100%);
+
+  /* 3-layer shadow on left edge */
+  box-shadow:
+    inset 1px 0 0 rgba(186, 152, 79, 0.15),       /* Layer 1: Inner left highlight */
+    -2px 0 4px rgba(186, 152, 79, 0.12),          /* Layer 2: Gold glow */
+    -4px 0 8px rgba(0, 0, 0, 0.6),                /* Layer 3: Dark depth */
+    -8px 0 16px rgba(0, 0, 0, 0.4);               /* Layer 3B: Extended depth */
+}
+
+#details-panel.panel-open {
+  transform: translateX(0);
+}
+
+/* Chat Panel - 3-LAYER SHADOW on right edge */
+#chat-panel {
+  left: 0;
+  transform: translateX(-100%);
+
+  /* 3-layer shadow on right edge */
+  box-shadow:
+    inset -1px 0 0 rgba(186, 152, 79, 0.15),      /* Layer 1: Inner right highlight */
+    2px 0 4px rgba(186, 152, 79, 0.12),           /* Layer 2: Gold glow */
+    4px 0 8px rgba(0, 0, 0, 0.6),                 /* Layer 3: Dark depth */
+    8px 0 16px rgba(0, 0, 0, 0.4);                /* Layer 3B: Extended depth */
+}
+
+#chat-panel.panel-open {
+  transform: translateX(0);
+}
+
+/* Detail Items - NO BORDER, use color layering */
+.detail-item {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(186, 152, 79, 0.03) 100%
+  );
+  box-shadow: inset 0 -1px 0 rgba(186, 152, 79, 0.08);
+}
 
 .message-bubble { max-width: 75%; padding: 0.5rem 1rem; border-radius: 1rem; }
 .message-incoming { background-color: #374151; align-self: flex-start; border-bottom-left-radius: 0.25rem; }
@@ -830,4 +1350,57 @@ body {
   30%  { opacity: 0.3; filter: blur(10px); }
   60%  { opacity: 0.7; filter: blur(16px); }
   100% { opacity: 1; filter: blur(22px); }
+}
+
+
+/* ===== BORDERLESS UTILITIES - Color Layering System ===== */
+
+/* Video Area - NO BORDER, use shadow for depth */
+.video-container-borderless {
+  background: linear-gradient(
+    180deg,
+    var(--black-soft) 0%,
+    var(--black-pure) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.05),
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Panel (Chat/Details) - NO BORDER, layered background */
+.side-panel-borderless {
+  background: linear-gradient(
+    180deg,
+    var(--gray-darkest) 0%,
+    var(--gray-dark) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(186, 152, 79, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Input Field - NO BORDER, inset shadow */
+.input-borderless {
+  background: linear-gradient(
+    180deg,
+    var(--black-warm) 0%,
+    var(--gray-darkest) 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(186, 152, 79, 0.05);
+}
+
+.input-borderless:focus {
+  background: linear-gradient(
+    180deg,
+    var(--gray-darkest) 0%,
+    var(--black-warm) 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 2px rgba(186, 152, 79, 0.3),
+    0 0 8px rgba(186, 152, 79, 0.2);
+  outline: none;
 }
