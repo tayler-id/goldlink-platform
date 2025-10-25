@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { BookOpen } from "lucide-react";
 import type React from "react";
@@ -78,6 +78,63 @@ const CPT_CODES = [
 const CODES_PER_PAGE = 4; // Reduced for better page layout
 const TOTAL_CPT_PAGES = Math.ceil(CPT_CODES.length / CODES_PER_PAGE);
 
+// ---------- Timer CPT Billing Codes ----------
+// These are time-based CPT codes for session billing
+interface TimerCPTCode {
+  code: string;
+  name: string;
+  minMinutes: number;
+  maxMinutes: number | null;
+  targetMinutes: number;
+  color: string;
+  description: string;
+}
+
+const TIMER_CPT_CODES: TimerCPTCode[] = [
+  {
+    code: '90832',
+    name: '30-min Psychotherapy',
+    minMinutes: 16,
+    maxMinutes: 37,
+    targetMinutes: 30,
+    color: '#F59E0B', // Amber
+    description: 'Billable range: 16-37 minutes'
+  },
+  {
+    code: '90834',
+    name: '45-min Psychotherapy',
+    minMinutes: 38,
+    maxMinutes: 52,
+    targetMinutes: 45,
+    color: '#10B981', // Green
+    description: 'Billable range: 38-52 minutes'
+  },
+  {
+    code: '90837',
+    name: '60-min Psychotherapy',
+    minMinutes: 53,
+    maxMinutes: null,
+    targetMinutes: 60,
+    color: '#3B82F6', // Blue
+    description: 'Billable range: 53+ minutes'
+  },
+];
+
+// Helper: Detect current CPT code based on elapsed minutes
+const detectCPTCode = (elapsedMinutes: number): TimerCPTCode | null => {
+  return TIMER_CPT_CODES.find(cpt => {
+    if (cpt.maxMinutes === null) {
+      return elapsedMinutes >= cpt.minMinutes;
+    }
+    return elapsedMinutes >= cpt.minMinutes && elapsedMinutes <= cpt.maxMinutes;
+  }) || null;
+};
+
+// Helper: Get next CPT threshold
+const getNextCPT = (elapsedMinutes: number): TimerCPTCode | null => {
+  return TIMER_CPT_CODES.find(cpt => cpt.minMinutes > elapsedMinutes) || null;
+};
+
 // Heights used to keep content above the absolute footer
 const PANEL_OPEN_HEIGHT = 160;       // .h-40 ≈ 160px
 const PANEL_CLOSED_OVERLAP = 30;     // only the handle peeks up when closed
@@ -127,13 +184,36 @@ export default function Page({ params }: { params: { roomId: string } }) {
   // Timer
   const [timerIsRunning, setTimerIsRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [timerFastMode, setTimerFastMode] = useState(false); // 60x speed for testing
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef(0);
+
+  // Timer Settings
+  const [showCPTIndicators, setShowCPTIndicators] = useState(true);
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
+  const [timerVisibility, setTimerVisibility] = useState<'hidden' | 'therapist' | 'all'>('all');
+
+  // Timer Reminders
+  const [showReminder, setShowReminder] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState('');
+  const dismissedRemindersRef = useRef<Set<string>>(new Set());
+
+  // Timer CPT Detection - Calculate current and next CPT codes
+  // Only recalculate when the minute value changes (not every millisecond)
+  const currentMinute = useMemo(() => Math.floor(elapsedTime / 60000), [elapsedTime]);
+
+  const currentCPT = useMemo(() => {
+    return detectCPTCode(currentMinute);
+  }, [currentMinute]);
+
+  const nextCPT = useMemo(() => {
+    return getNextCPT(currentMinute);
+  }, [currentMinute]);
 
   // Refs
   const flipBookRef = useRef<any>(null);
   const mainContentRef = useRef<HTMLDivElement | null>(null);
-  const footerRef = useRef<HTMLElement | null>(null)
+  const footerRef = useRef<HTMLElement | null>(null);
 
 
   // ---------- Effects ----------
@@ -167,38 +247,41 @@ export default function Page({ params }: { params: { roomId: string } }) {
   // Panels now overlay the video instead of pushing it
   // (removed padding adjustment effect)
 
-// Lift main content and PiP exactly above the footer height
-useEffect(() => {
-  const mainEl = mainContentRef.current;
-  const footerEl = footerRef.current;
+  // Lift main content and PiP exactly above the footer height
+  useEffect(() => {
+    const mainEl = mainContentRef.current;
+    const footerEl = footerRef.current;
 
-  const HANDLE_EXPOSED = 30;
-  const SAFE_GAP = 8;
+    const HANDLE_EXPOSED = 30;
+    const SAFE_GAP = 8;
 
-  const updatePositions = () => {
-    const footerHeight = footerEl
-      ? Math.round(footerEl.getBoundingClientRect().height)
-      : 160; // fallback to h-40
+    const updatePositions = () => {
+      const footerHeight = footerEl
+        ? Math.round(footerEl.getBoundingClientRect().height)
+        : 160; // fallback to h-40
 
-    const pad = isControlPanelOpen
-      ? footerHeight + SAFE_GAP
-      : HANDLE_EXPOSED + SAFE_GAP;
+      const pad = isControlPanelOpen
+        ? footerHeight + SAFE_GAP
+        : HANDLE_EXPOSED + SAFE_GAP;
 
-    if (mainEl) mainEl.style.paddingBottom = `${pad}px`;
-  };
+      if (mainEl) mainEl.style.paddingBottom = `${pad}px`;
+    };
 
-  updatePositions();
-  window.addEventListener("resize", updatePositions);
-  return () => window.removeEventListener("resize", updatePositions);
-}, [isControlPanelOpen]);
+    updatePositions();
+    window.addEventListener("resize", updatePositions);
+    return () => window.removeEventListener("resize", updatePositions);
+  }, [isControlPanelOpen]);
 
 
-  // timer logic
+  // timer logic with fast mode support (60x speed for testing)
   useEffect(() => {
     if (timerIsRunning) {
       startTimeRef.current = Date.now() - elapsedTime;
+      const speedMultiplier = timerFastMode ? 60 : 1;
+
       timerIntervalRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - startTimeRef.current);
+        const realElapsed = Date.now() - startTimeRef.current;
+        setElapsedTime(realElapsed * speedMultiplier);
       }, 100);
     } else if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
@@ -206,7 +289,72 @@ useEffect(() => {
     return () => {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     };
-  }, [timerIsRunning]);
+  }, [timerIsRunning, timerFastMode]);
+
+  // Log CPT changes for debugging
+  useEffect(() => {
+    if (currentMinute < 16) {
+      console.log(`⏱️ CPT: Not billable (${currentMinute} min)`);
+    } else if (currentCPT) {
+      console.log(`✅ CPT: ${currentCPT.code} - ${currentCPT.name} (${currentMinute} min)`);
+      if (nextCPT && currentCPT.maxMinutes) {
+        const progress = ((currentMinute - currentCPT.minMinutes) / (currentCPT.maxMinutes - currentCPT.minMinutes)) * 100;
+        console.log(`   ⏭️  Next: ${nextCPT.code} in ${currentCPT.maxMinutes - currentMinute + 1} min`);
+        console.log(`   📊 Progress: ${Math.round(progress)}% through ${currentCPT.code} window`);
+      } else {
+        console.log(`   🏁 Final CPT code - no progress bar`);
+      }
+    }
+  }, [currentCPT, currentMinute, nextCPT]);
+
+  // Keyboard shortcut to toggle fast mode (F key)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only toggle if timer modal is open and F key is pressed
+      if (e.key === 'f' || e.key === 'F') {
+        if (activeModal === 'timer') {
+          setTimerFastMode(prev => {
+            const newMode = !prev;
+            console.log(`⚡ Fast Mode ${newMode ? 'ENABLED' : 'DISABLED'} (${newMode ? '60x' : '1x'} speed)`);
+            return newMode;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [activeModal]);
+
+  // CPT Reminder System - Show reminders at 5 min and 2 min before next CPT threshold
+  useEffect(() => {
+    if (!remindersEnabled || !currentCPT || !nextCPT || !currentCPT.maxMinutes) return;
+
+    const minutesToNext = currentCPT.maxMinutes - currentMinute + 1;
+    const reminderKey = `${currentCPT.code}-${minutesToNext}`;
+
+    // Show reminder at 5 min and 2 min before next CPT
+    if ((minutesToNext === 5 || minutesToNext === 2) && !dismissedRemindersRef.current.has(reminderKey)) {
+      setReminderMessage(`${minutesToNext} minutes until ${nextCPT.code} threshold`);
+      setShowReminder(true);
+      dismissedRemindersRef.current.add(reminderKey);
+
+      console.log(`⏰ Reminder: ${minutesToNext} min until ${nextCPT.code}`);
+
+      // Auto-dismiss after 10 seconds
+      setTimeout(() => {
+        setShowReminder(false);
+      }, 10000);
+    }
+  }, [currentMinute, currentCPT, nextCPT, remindersEnabled]);
+
+  // Reset dismissed reminders when timer resets
+  useEffect(() => {
+    if (elapsedTime === 0) {
+      dismissedRemindersRef.current.clear();
+      setShowReminder(false);
+    }
+  }, [elapsedTime]);
 
   // ---------- WebRTC Initialization ----------
   async function initializeSession() {
@@ -236,11 +384,11 @@ useEffect(() => {
         console.log('✅ Local video ref set');
       }
 
-      // 2. Connect Socket.io and wait for connection
+      // 2. Connect Socket.io (synchronous - no await needed)
       // Note: Will use "Loading..." initially, but will be updated when session data loads
-      await socketManager.connect(therapistName);
+      socketManager.connect(therapistName);
 
-      // 3. Subscribe to room (socket.id is now available)
+      // 3. Subscribe to room (socket.id will be available after 'connect' event fires)
       socketManager.subscribeToRoom(roomIdFromParams, therapistName);
 
       // 4. Set up Socket.io event listeners
@@ -374,14 +522,13 @@ useEffect(() => {
     socketManager.onMessage((data) => {
       console.log('📨 Received message from:', data.userName, '- Message:', data.message);
 
-      // Add message from other participants (sender already added their own message locally)
+      // Add message from other participants (sender: "them" for all received messages)
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + Math.random(), // Unique ID to prevent collisions
           text: data.message,
-          // Determine if therapist or client based on userName match
-          sender: data.userName.includes(therapistName) || data.userName.includes('Therapist') || data.userName.includes('Jones') ? 'therapist' : 'client',
+          sender: 'them', // All received messages are from "them" (the other participant)
         },
       ]);
     });
@@ -415,8 +562,8 @@ useEffect(() => {
     // Send via Socket.io with real therapist name
     socketManager.sendMessage(messageText, therapistName);
 
-    // Add to local messages immediately (only sender sees this)
-    setMessages((m) => [...m, { id: Date.now() + Math.random(), text: messageText, sender: "therapist" }]);
+    // Add to local messages immediately (sender = "me" for current user)
+    setMessages((m) => [...m, { id: Date.now() + Math.random(), text: messageText, sender: "me" }]);
     setChatInput("");
   };
 
@@ -660,6 +807,7 @@ useEffect(() => {
     const seconds = totalSeconds % 60;
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
+
   const totalSeconds = Math.floor(elapsedTime / 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -726,11 +874,26 @@ useEffect(() => {
                 {remoteStreams.size > 0 ? 'Participant Connected' : 'Waiting...'}
               </div>
               <div
-                className={`bg-black/60 backdrop-blur-sm text-gold rounded-lg px-4 py-2 text-lg font-bold font-orbitron ${
+                className={`bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-lg font-bold font-orbitron ${
                   elapsedTime > 0 ? "" : "hidden"
                 }`}
               >
-                {formatTime(elapsedTime)}
+                <div className="flex items-center gap-2">
+                  <span className="text-gold">{formatTime(elapsedTime)}</span>
+                  {showCPTIndicators && currentCPT && (
+                    <>
+                      <span className="text-white/40">|</span>
+                      <span
+                        className="text-white text-base font-black px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: currentCPT.color
+                        }}
+                      >
+                        {currentCPT.code}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -794,7 +957,7 @@ useEffect(() => {
 
           {/* Chat */}
           <button
-            onClick={() => setIsChatPanelOpen(true)}
+            onClick={() => setIsChatPanelOpen(prev => !prev)}
             className="glass-control-button flex flex-col items-center justify-center gap-2"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -821,7 +984,7 @@ useEffect(() => {
 
           {/* Details */}
           <button
-            onClick={() => setIsDetailsPanelOpen(true)}
+            onClick={() => setIsDetailsPanelOpen(prev => !prev)}
             className="glass-control-button flex flex-col items-center justify-center gap-2"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -858,7 +1021,7 @@ useEffect(() => {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`message-bubble ${msg.sender === "therapist" ? "message-outgoing" : "message-incoming"}`}
+              className={`message-bubble ${msg.sender === "me" ? "message-outgoing" : "message-incoming"}`}
             >
               {msg.text}
             </div>
@@ -1125,17 +1288,42 @@ useEffect(() => {
           <button onClick={() => setActiveModal(null)} className="modal-close-btn">
             X
           </button>
+
+          {/* Fast Mode Indicator */}
+          {timerFastMode && (
+            <div className="timer-fast-mode-indicator">
+              <span className="text-amber-400 font-orbitron font-bold text-xs">
+                ⚡ FAST MODE (60x)
+              </span>
+              <span className="text-white/60 text-xs ml-2">Press F to disable</span>
+            </div>
+          )}
+
           <div className="stopwatch-body frosted-glass">
             <div className={`stopwatch-face ${timerIsRunning ? 'running' : ''}`}>
               <svg viewBox="0 0 200 200">
+                {/* CPT colored ring around clock */}
+                {showCPTIndicators && currentCPT && (
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="98"
+                    fill="none"
+                    stroke={currentCPT.color}
+                    strokeWidth="4"
+                    opacity="0.4"
+                    className="cpt-ring"
+                  />
+                )}
+
                 <g>{renderDialMarks()}</g>
                 <circle cx="100" cy="60" r="25" fill="rgba(31, 41, 55, 0.5)" stroke="#9ca3af" strokeWidth="1" />
                 <g>{renderSubDialMarks()}</g>
                 <text id="hour-display" x="100" y="145" textAnchor="middle">
                   {String(seconds).padStart(2, "0")}
                 </text>
-                <g id="minute-hand" className="hand" style={{ transform: `rotate(${minuteDeg}deg)` }}>
-                  <rect x="99" y="35" width="2" height="25" fill="white" rx="1" />
+                <g id="minute-hand">
+                  <rect x="99" y="35" width="2" height="25" fill="white" rx="1" transform={`rotate(${minuteDeg} 100 60)`} />
                 </g>
                 <g id="second-hand" className="hand" style={{ transform: `rotate(${secondDeg}deg)` }}>
                   <polygon points="100,20 102,110 98,110" fill="#FBBF24" />
@@ -1177,6 +1365,107 @@ useEffect(() => {
             }}
             onClick={handleResetTimer}
           />
+
+          {/* CPT Indicator Badge */}
+          {showCPTIndicators && (
+            <div className="cpt-indicator-container">
+              {currentMinute < 16 ? (
+              <div className="cpt-not-billable">
+                <span className="text-red-400 text-base font-orbitron font-semibold">
+                  ⏱️ Not billable (under 16 min)
+                </span>
+              </div>
+            ) : currentCPT ? (
+              <div
+                className="cpt-active-badge"
+                style={{ borderColor: currentCPT.color }}
+              >
+                <div
+                  className="cpt-code-large font-orbitron font-bold"
+                  style={{ color: currentCPT.color }}
+                >
+                  {currentCPT.code}
+                </div>
+                <div className="text-white text-base mt-1 font-medium">
+                  {currentCPT.name}
+                </div>
+                <div className="text-white/70 text-sm mt-0.5">
+                  {currentCPT.description}
+                </div>
+
+                {/* Progress Bar to Next CPT */}
+                {nextCPT && currentCPT.maxMinutes && (
+                  <div className="cpt-progress-container">
+                    <div className="cpt-progress-label">
+                      <span className="text-sm text-white/70 font-medium">Progress to {nextCPT.code}</span>
+                      <span className="text-sm text-amber-400 font-semibold">
+                        {currentCPT.maxMinutes - currentMinute + 1} min remaining
+                      </span>
+                    </div>
+                    <div className="cpt-progress-bar">
+                      <div
+                        className="cpt-progress-fill"
+                        style={{
+                          width: `${((currentMinute - currentCPT.minMinutes) / (currentCPT.maxMinutes - currentCPT.minMinutes)) * 100}%`,
+                          background: `linear-gradient(90deg, ${currentCPT.color}, ${nextCPT.color})`
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
+            </div>
+          )}
+
+          {/* Timer Settings Section */}
+          <div className="timer-settings-container">
+            <div className="frosted-glass rounded-lg p-4 border border-gold/20">
+              <h3 className="font-orbitron text-gold text-sm mb-3 font-bold">Timer Settings</h3>
+
+              {/* Show CPT Indicators */}
+              <label className="flex items-center gap-3 mb-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={showCPTIndicators}
+                  onChange={(e) => setShowCPTIndicators(e.target.checked)}
+                  className="w-4 h-4 accent-gold cursor-pointer"
+                />
+                <span className="text-white text-xs group-hover:text-gold transition-colors">
+                  Show CPT Code Indicators
+                </span>
+              </label>
+
+              {/* Enable Reminders */}
+              <label className="flex items-center gap-3 mb-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={remindersEnabled}
+                  onChange={(e) => setRemindersEnabled(e.target.checked)}
+                  className="w-4 h-4 accent-gold cursor-pointer"
+                />
+                <span className="text-white text-xs group-hover:text-gold transition-colors">
+                  Enable Time Reminders (5 & 2 min)
+                </span>
+              </label>
+
+              {/* Timer Visibility */}
+              <div>
+                <label className="text-white text-xs mb-2 block font-orbitron">
+                  Timer Visibility
+                </label>
+                <select
+                  value={timerVisibility}
+                  onChange={(e) => setTimerVisibility(e.target.value as 'hidden' | 'therapist' | 'all')}
+                  className="bg-black/60 border border-gold/30 text-white text-xs rounded px-3 py-2 w-full font-orbitron cursor-pointer hover:border-gold/50 transition-colors"
+                >
+                  <option value="hidden">Hidden from All</option>
+                  <option value="therapist">Therapist Only</option>
+                  <option value="all">Visible to Everyone</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1243,6 +1532,34 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* CPT Reminder Toast */}
+      {showReminder && (
+        <div
+          className="fixed top-20 right-4 z-50 cpt-reminder-toast"
+          role="alert"
+          aria-live="polite"
+        >
+          <div className="frosted-glass border-2 border-amber-400 rounded-lg px-6 py-4 flex items-center gap-3 shadow-2xl">
+            <span className="text-3xl">⏰</span>
+            <div>
+              <div className="font-orbitron text-white text-sm font-bold">
+                Session Reminder
+              </div>
+              <div className="text-white/90 text-xs mt-0.5">
+                {reminderMessage}
+              </div>
+            </div>
+            <button
+              onClick={() => setShowReminder(false)}
+              className="text-white/60 hover:text-white ml-2 text-xl font-bold transition-colors"
+              aria-label="Dismiss reminder"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

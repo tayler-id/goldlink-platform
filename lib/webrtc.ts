@@ -175,6 +175,12 @@ class WebRTCManager {
       return;
     }
 
+    // Skip invalid candidates (null or missing required fields)
+    if (!candidate || (candidate.candidate === '' && !candidate.sdpMid && candidate.sdpMLineIndex === null)) {
+      // End-of-candidates signal - ignore
+      return;
+    }
+
     try {
       await pc.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
@@ -186,12 +192,19 @@ class WebRTCManager {
    * Toggle video track
    */
   toggleVideo(enabled?: boolean): boolean {
-    if (!this.localStream) return false;
+    if (!this.localStream) {
+      console.error('toggleVideo: No local stream available');
+      return false;
+    }
 
     const videoTrack = this.localStream.getVideoTracks()[0];
-    if (!videoTrack) return false;
+    if (!videoTrack) {
+      console.error('toggleVideo: No video track found');
+      return false;
+    }
 
     videoTrack.enabled = enabled !== undefined ? enabled : !videoTrack.enabled;
+    console.log('toggleVideo: Video track enabled =', videoTrack.enabled);
     return videoTrack.enabled;
   }
 
@@ -199,12 +212,19 @@ class WebRTCManager {
    * Toggle audio track
    */
   toggleAudio(enabled?: boolean): boolean {
-    if (!this.localStream) return false;
+    if (!this.localStream) {
+      console.error('toggleAudio: No local stream available');
+      return false;
+    }
 
     const audioTrack = this.localStream.getAudioTracks()[0];
-    if (!audioTrack) return false;
+    if (!audioTrack) {
+      console.error('toggleAudio: No audio track found');
+      return false;
+    }
 
     audioTrack.enabled = enabled !== undefined ? enabled : !audioTrack.enabled;
+    console.log('toggleAudio: Audio track enabled =', audioTrack.enabled);
     return audioTrack.enabled;
   }
 

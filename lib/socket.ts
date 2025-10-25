@@ -13,9 +13,9 @@ class SocketManager {
   private socketId: string | null = null;
 
   /**
-   * Initialize socket connection and wait for it to be ready
+   * Initialize socket connection
    */
-  async connect(userName?: string): Promise<Socket> {
+  connect(userName?: string): Socket {
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -26,13 +26,9 @@ class SocketManager {
       rejectUnauthorized: false, // Allow self-signed certs
     });
 
-    // Wait for connection to establish
-    await new Promise<void>((resolve) => {
-      this.socket!.on('connect', () => {
-        console.log('Socket connected:', this.socket?.id);
-        this.socketId = this.socket?.id || null;
-        resolve();
-      });
+    this.socket.on('connect', () => {
+      console.log('Socket connected:', this.socket?.id);
+      this.socketId = this.socket?.id || null;
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -56,13 +52,25 @@ class SocketManager {
 
     this.roomId = roomId;
 
-    this.socket.emit('subscribe', {
-      room: roomId,
-      socketId: this.socket.id,
-      userName: userName || 'Anonymous',
-    });
+    // Wait for socket.id to be available before subscribing
+    const doSubscribe = () => {
+      if (this.socket && this.socket.id) {
+        this.socket.emit('subscribe', {
+          room: roomId,
+          socketId: this.socket.id,
+          userName: userName || 'Anonymous',
+        });
+        console.log(`Subscribed to room: ${roomId} with socket ID: ${this.socket.id}`);
+      }
+    };
 
-    console.log(`Subscribed to room: ${roomId}`);
+    // If already connected, subscribe immediately
+    if (this.socket.connected && this.socket.id) {
+      doSubscribe();
+    } else {
+      // Otherwise wait for connect event
+      this.socket.once('connect', doSubscribe);
+    }
   }
 
   /**
