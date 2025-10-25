@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Goldlink - Video Session</title>
+    <link rel="stylesheet" href="style.css" />
+	<link rel="apple-touch-icon-precomposed" sizes="57x57" href="./favicons/apple-touch-icon-57x57.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="./favicons/apple-touch-icon-114x114.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="./favicons/apple-touch-icon-72x72.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="./favicons/apple-touch-icon-144x144.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="60x60" href="./favicons/apple-touch-icon-60x60.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="./favicons/apple-touch-icon-120x120.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="./favicons/apple-touch-icon-76x76.png" />
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="./favicons/apple-touch-icon-152x152.png" />
+	<link rel="icon" type="image/png" href="./favicons/favicon-196x196.png" sizes="196x196" />
+	<link rel="icon" type="image/png" href="./favicons/favicon-96x96.png" sizes="96x96" />
+	<link rel="icon" type="image/png" href="./favicons/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="./favicons/favicon-16x16.png" sizes="16x16" />
+	<link rel="icon" type="image/png" href="./favicons/favicon-128.png" sizes="128x128" />
+	<meta name="application-name" content="&nbsp;"/>
+	<meta name="msapplication-TileColor" content="#FFFFFF" />
+	<meta name="msapplication-TileImage" content="./favicons/mstile-144x144.png" />
+	<meta name="msapplication-square70x70logo" content="./favicons/mstile-70x70.png" />
+	<meta name="msapplication-square150x150logo" content="./favicons/mstile-150x150.png" />
+	<meta name="msapplication-wide310x150logo" content="./favicons/mstile-310x150.png" />
+	<meta name="msapplication-square310x310logo" content="./favicons/mstile-310x310.png" />
+    <script src="/socket.io/socket.io.js"></script>
+    <!--<script src="https://kit.fontawesome.com/cedcefe3a9.js" crossorigin="anonymous"></script>-->
+    <link href="/fa/css/fontawesome.css" rel="stylesheet" />
+    <link href="/fa/css/brands.css" rel="stylesheet" />
+    <link href="/fa/css/solid.css" rel="stylesheet" />
+    <script src='tf.js'></script>
+    <script src='tf.body-pix.min.js'></script>
+    <link rel="stylesheet" href="openplayer.min.css" /> <!-- volume bar etc, unless I make my own custom one eventually -->
+    <script>
+      const ROOM_ID = "<%= roomId %>";
+      var UNREAD_NOTIFS = 0;
+    </script>
+  </head>
+  <body style="background-color:#161d29">
+    <div class="header">
+      <div class="logo">
+        <!--<div class="header__back">
+          <i class="fas fa-angle-left"></i>
+        </div>-->
+        <!--<img src="Golden-Therapy-logo2.png" alt="Golden Therapy Logo" style="width:55px;display:inline-block;margin-left:15px;margin-top:-10px;position:absolute;opacity:0.5;">-->
+        <h3 class="headertitletext" id="headertitletext" style="margin-left:4%; margin-right:3px;display:inline-block;color:gold;font-family:Garamond;font-size:16px;"></h3>
+        <!--<i class='fa fa-times' aria-hidden='true' style="position:absolute;right:9px;top:9px;font-size:10px;color:white;" id="closeheader"></i>-->
+        <!--<img src="Goldern-Therapy-logo2.png" alt="Golden Therapy Logo" style="width:33px;display:inline-block;margin-left:11px;position:absolute;">-->
+        <!--<img src="Goldern-Therapy-logo2.png" alt="Golden Therapy Logo" style="width:55px;display:inline-block;margin-left:15px;margin-top:-6px;position:absolute;">
+        <h3 id="headertitletext" style="margin-left:18px; margin-right:3px;display:inline-block;">Golden Therapy</h3>-->
+        <!--<img src="Goldern-Therapy-logo2.png" alt="Golden Therapy Logo" style="width:55px;display:inline-block;margin-left:15px;margin-top:-10px;position:absolute;">
+        <h3 id="headertitletext" style="margin-left:66px; margin-right:3px;margin-top:2px;display:inline-block;">Golden Therapy</h3>-->
+        <span class="timerDisplay" id="headerTimerDisplay" style="display:none;"><i class='fa fa-clock-o' aria-hidden='true' style="font-size:11px;"></i> <span id="headerInternalTimerDisplay">00:00</span></span>
+      </div>
+      <div class="logomid">
+        <h3 id="headertitlemid" style="margin-left:3%; margin-right:3px;display:inline-block;color:white;">Goldlink</h3>
+        <img src="Golden-Therapy-logo2.png" alt="Goldlink Logo" style="width:45px;display:inline-block;margin-left:-95px;margin-top:-5px;position:absolute;">
+      </div>
+      <div class="logoright">
+      </div>
+    </div>  
+    <div id="fadetoblack1" style="position:absolute;opacity:1.0;height:98%;width:99%;z-index:3;display:none;background-position:50%;background-size: cover;background-repeat: no-repeat;background-color:white;"></div>
+    <div class="waitingroom" id="waitingroom1" style="position:absolute;background: linear-gradient(#55627e, #162129);height:100%;width:100%;display:none;color:white;overflow:hidden;z-index:1;">
+      <h1 style="margin-left:6px;text-align:center;font-size:34px;">Welcome!</h1>
+      <p style="margin-left:6px;text-align:center;font-size:22px;">Waiting to join the session, please wait for host..</p>
+      <section style="z-index:-1;">
+        <span class="star"></span>
+        <span class="star"></span>
+        <span class="star"></span>
+        <span class="star"></span>
+      </section>
+      <video class="waitingroomvideo" id="waitingroomvideo1" autoplay loop playsinline webkit-playsinline volume="0.1" muted style="width:97%;border:solid 0px black;clip-path: inset(1px 1px);max-width:100vw;transform: scale(1,1);">
+        <source src="/bmapi/waitingroomvideo1" type="video/mp4" id="waitingroomvideosrc1" autoplay>
+        Your browser does not support the HTML5 player.
+      </video>      
+    </div>
+    <div class="endsession" id="endsession1" style="position:absolute;background: linear-gradient(#80FFDB, #5390D9);height:150vh;width:100%;padding-bottom:12px;display:none;color:white;">
+      <div style="display:none;position:absolute;" id="endsessiontherapistlink"><a href="https://my.goldlink.live"><i class="fas fa-angle-left"></i> Therapist Home</a></div>
+      <h2 style="margin-left:6px;text-align:center;font-size:32px;padding-top:20px;">Until next time!</h2>
+      <p style="margin-left:6px;text-align:center;font-size:20px;">The session has ended, you may now close this window.</p>
+      <video class="endsessionvideo" id="endsessionvideo1" autoplay loop playsinline webkit-playsinline volume="0.1" style="width:98%;border:solid 0px black;clip-path: inset(1px 1px);max-width:100vw;">
+        <source src="/bmapi/endsessionvideo1" type="video/mp4" id="endsessionvideosrc1" autoplay>
+        Your browser does not support the HTML5 player.
+      </video>      
+    </div>
+    <div class="main">  
+    <div class="main__left" style="flex:1;">
+      
+      <div class="videos__group">
+        <div id="video-grid">
+          <canvas id="canvas" hidden style="border: 2px solid gold;border-radius:1rem;margin:0.5rem;height: 34vh !important;width: 100%;min-width: 180px;max-width: 244px; max-height: 188px; margin-top: 6rem; margin-right: 1rem; z-index:2;"></canvas>
+        </div>
+      </div>
+      <div class="options" style="display:none;justify-content:center;">
+        <div class="options__left">
+          <div id="stopVideo" class="options__button" style="position: fixed; top:60vh; left:0px;">
+            <i class="fa fa-video-camera"></i>
+          </div>
+          <div id="muteButton" class="options__button" style="position: fixed; top: calc(60vh + 60px); left:0px;">
+            <i class="fa fa-microphone"></i>
+          </div>
+          <div id="showChat" class="options__button" style="position: fixed; top: calc(60vh + 120px); left:0px;">
+            <i class="fa fa-comment"></i><span class="button__badge" id="new-chat-notification" hidden>1</span>
+          </div>
+          <!--<div id="volumeSlider" class="range-slider" >
+            <input type="range" min="0" max="100" value="50" class="slider">
+          </div>-->
+          <div id="inviteButton" class="options__button" style="position: fixed; top: calc(60vh + 180px); left:0px;">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div id="optionsButton" class="options__button" style="position: fixed; top: calc(60vh + 240px); left:0px;" hidden>
+            <i class="fa fa-cog"></i>
+          </div>
+        </div>
+        <div class="options__right">
+
+        </div>
+      </div>
+    </div>
+    <div class="tabs-container" style="position:flex;display:none;">
+      <ul class="tabrow">
+        <li class="tabli" onclick="onCentralTabClick(this)"><a href="#">Lorem</a></li>
+        <li class="tabli" onclick="onCentralTabClick(this)"><a href="#">Ipsum</a></li>
+        <li class="tabli selected" onclick="onCentralTabClick(this)"><a href="#">Sit amet</a></li>
+        <li class="tabli" onclick="onCentralTabClick(this)"><a href="#">Consectetur adipisicing</a></li>
+      </ul>  
+    </div>
+    <div class="main__right" style="display:none;max-height:100vh;">
+      <div class="header__back" style="top:15px">
+        <i class="fas fa-angle-left" style="cursor:pointer;display:inline-block;"></i>
+      </div>
+      <div class="main__chat_window">
+        <div class="header__back2" style="top:15px;">
+          <span id="mainChatCloseButton" class="close-btn" style="cursor:pointer;color:white;padding-left:15px;padding-top:20px;right:8px;"> <i class="fas fa-angle-left" style="cursor:pointer;"></i> </span>
+        </div>
+          <div class="messages">
+
+          </div>
+      </div>
+      <div class="main__message_container">
+        <input id="chat_message" type="text" autocomplete="off" placeholder="Type message here...">
+        <div id="send" class="options__button">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="streamingOptionsModal" class="modal" style="overflow-y: scroll;height:100%;">
+    <div class="modal-content" style="background-color:#172d39;color:white;">
+      <span id="streamingOptionsCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2>Your Stream Options</h2>
+      <p style="margin-top:8px;"><a href="#" id="optionsButtonBlurOn">Turn On Background Blurring</a> <i class="fa fa-square"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"><a href="#" id="optionsButtonBlurOff">Turn Off Background Blurring</a> <i class="fa fa-square-o"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonMirror">Mirror/Flip</a> <i class="fa fa-square"></i></p>
+      <br/>
+
+      <div style="margin-top:20px;">
+        <h6>Experimental Moving Features</h6>
+        <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="myoptionsButtonResetMovements" style="color:white;">Reset</a> <i class="fa fa-redo"></i></p>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Moveable <input id="mystreamingOptionsModal2draggable" type="checkbox" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width:16px">
+        </div><br/>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Width <input id="mystreamingOptionsModal2scaling" type="range" min="0.1" max="2.1" step="0.1" value="1" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width: 22.5vw;">
+        </div><br/>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Height <input id="mystreamingOptionsModal2scalingy" type="range" min="0.1" max="2.1" step="0.1" value="1" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width: 22.5vw;">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="streamingOptionsModal2" class="modal" style="overflow-y: scroll;height:100%;display:none;">
+    <div class="modal-content" style="background-color:#172d39;color:white;">
+      <span id="streamingOptionsCloseButton2" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2>Video Options</h2><br/>
+      <div style="display:inline-block;margin-bottom:6px;">
+        Volume <input id="streamingOptionsModal2volume" type="range" min="0" max="1" step="0.05" value="1" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width: 33vw;">
+      </div>
+      
+      <div>
+        <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonMirror">Mirror/Flip</a> <i class="fa fa-flip"></i></p>
+        <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonFullScreen">Fullscreen</a> <i class="fa fa-arrows-alt"></i></p>
+        <p class="CpanelButton" style="margin-top:6px;display:none;"> <a href="#" id="optionsButtonSmaller">Resize Smaller</a> <i class="fa fa-square"></i></p>
+        <p class="CpanelButton" style="margin-top:6px;display:none;"> <a href="#" id="optionsButtonLarger">Resize Larger</a> <i class="fa fa-square"></i></p>
+        <p class="CpanelButton" style="margin-top:6px;display:none;"> <a href="#" id="optionsButtonReset">Reset To Default</a> <i class="fa fa-square"></i></p>
+        <p class="CpanelButton otherTherapistOptions" style="margin-top:6px;display:none;"> <a href="#" id="optionsButtonRemoveClient">Kick/Remove Client</a> <i class="fa fa-user-times"></i></p>
+      </div>
+
+      <div style="margin-top:32px;">
+        <h6>Experimental Moving Features</h6>
+        <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonResetMovements" style="color:white;">Reset</a> <i class="fa fa-redo"></i></p>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Moveable <input id="streamingOptionsModal2draggable" type="checkbox" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width:16px">
+        </div><br/>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Width <input id="streamingOptionsModal2scaling" type="range" min="0.1" max="2.1" step="0.1" value="1" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width: 22.5vw;">
+        </div><br/>
+        <div style="display:inline-block;margin-top:6px;margin-bottom:6px;">
+          Height <input id="streamingOptionsModal2scalingy" type="range" min="0.1" max="2.1" step="0.1" value="1" style="display:inline-block;position:absolute;margin-top:5px;margin-left:5px;width: 22.5vw;">
+        </div>
+      </div>
+      <br/>
+    </div>
+  </div>
+
+  <div id="optionsModal" class="modal" style="overflow-y: scroll;height:80vh;">
+    <div class="modal-content" style="background-color:#172d39;color:white;">
+      <span id="optionsCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:2px;">Options</h2>
+      <p class="CpanelButton" style="margin-top:8px;"><a href="#" id="optionsButtonEncylopedia" title="Reference of common CPT codes.">CPT Code Reference</a> <i class="fa fa-book"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"><a href="#" id="optionsButtonSearchFrame" title="Opens a virtual search box in a virtual tab without leaving the session.">Search</a> <i class="fa fa-search"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonOrientation" title="Sets position of the main buttons for everyone in the session.">Button Orientation</a> <i class="fa fa-arrows"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonTimer" title="Enable or reset the timer, and set who sees the timer.">Timer Settings</a> <i class="fa fa-clock"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonLook" title="Change the color layout of the room.">Color Settings</a> <i class="fa fa-paintbrush"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonScreenShare" title="Enable screen sharing for yourself, or enable other users to share their screen.">Screen Sharing</a> <i class="fa fa-desktop"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonSetupDate" title="View therapist scheduling in a virtual tab, without leaving the session.">View Calendar</a> <i class="fa fa-calendar"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="optionsButtonViewHome" title="View therapist home in a virtual tab, without leaving the session.">View Home</a> <i class="fa fa-home"></i></p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="buttonSessionRefresh" title="Resets the session in case of unforeseen issues. Everyone will be signalled and automatically reconnect to the current session within seconds.">Refresh Session</a> <i class="fa fa-refresh"></i> </p>
+      <p class="CpanelButton" style="margin-top:6px;"> <a href="#" id="buttonSessionBegin" title="Opens the waiting room. Anyone waiting will be allowed into the session.">Open Waiting Room</a> <i class="fa fa-sign-in"></i> </p>
+      <p class="CpanelButton" style="margin-top:6px;padding-bottom:8px;"> <a href="#" id="buttonSessionEnd" style="margin-bottom:10px;" title="Ends the session. Session will remain closed until a therapist starts the session from the Therapist area.">End Session</a> <i class="fa fa-sign-out"></i> </p>
+    </div>
+  </div>
+
+  <div id="modalEncylopedia" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalEncylopediaCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:10px;color:white;">CPT Code Reference</h2>
+      <iframe src="encyclopedia/2023_DHS_Code_List_Only_Therapy.txt" frameBorder="1" class="" scrolling="auto" height="100%" width="100%" style="background-color:white;"></iframe>
+      <br/>
+    </div>
+  </div>
+
+  <div id="modalButtonOrient" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalButtonOrientCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+        <h2 style="margin-bottom:10px;color:white;">Set Button Orientation</h2>
+        <p id="buttonOrientLeft" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-arrow-left"></i> Left </p>
+        <p id="buttonOrientBottom" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-arrow-down"></i> Bottom </p>
+        <p id="buttonOrientTop" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-arrow-up"></i> Top</p>
+        <br/>
+        <br/>
+    </div>
+  </div>
+
+  <div id="modalButtonLook" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalButtonLookCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+        <h2 style="margin-bottom:10px;color:white;">Change Color Scheme</h2>
+        <p id="buttonLook1" class="CpanelInternalButton" style="cursor: pointer;"> Light </p>
+        <p id="buttonLook2" class="CpanelInternalButton" style="cursor: pointer;"> Dark </p>
+        <p id="buttonLook0" class="CpanelInternalButton" style="cursor:pointer;display:none;"> Original </p>
+        <br/>
+        <br/>
+    </div>
+  </div>
+
+  <div id="modalSearchFrame" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalSearchFrameCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+        <h2 style="margin-bottom:10px;color:white;">Internal Searching</h2>
+        <script async src="https://cse.google.com/cse.js?cx=13f181962b3874627">
+        </script>
+        <div class="gcse-search"></div>
+        <br/>
+        <br/>
+    </div>
+  </div>
+
+  <div id="modalTimer" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalTimerCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:10px;color:white;">Timer Settings</h2><br/>
+      <h3>Timer</h3>
+        <p id="buttonTimerReset" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-hourglass-start"></i> Start/Reset Timer </p>
+      <br/><h3>Visiblity</h3>
+        <p id="buttonTimerOff" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-circle"></i> Off </p>
+        <p id="buttonTimerTherapist" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-low-vision"></i> Display to Therapist </p>
+        <p id="buttonTimerAll" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-eye "></i> Display to All </p>
+        <br/>
+        <br/>
+    </div>
+  </div>
+
+  <div id="modalShareScreen" class="modal">
+    <div class="modal-content" style="width:80%;height:100%;background-color:#172d39;color:white;">
+      <span id="modalShareScreenCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+        <h2 style="margin-bottom:10px;color:white;">Screen Sharing Settings</h2><br/>
+        <h3>Share Your Screen</h3>
+          <p id="buttonScreenShareOn" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-desktop"></i> Turn ScreenShare On </p>
+          <p id="buttonScreenShareOff" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-stop"></i> Turn ScreenShare Off </p>
+
+        <br/><h3>Allow Clients to Share Screen</h3>
+        <p id="buttonScreenShareClientOn" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-user-plus"></i> Allow (1-Time)</p>
+        <!-- <p id="buttonScreenShareClientOff" class="CpanelInternalButton" style="cursor: pointer;"><i class="fa fa-user-times"></i> Deny </p> -->
+        <br/>
+        <br/>
+    </div>
+  </div>
+
+  <div id="setDateModal" class="modal">
+    <div class="modal-content" style="width:80%;height:89%;background-color:#172d39;">
+      <span id="setDateCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:3px;color:white;">View Calendar</h2>
+      <p>
+        <iframe id="setupDateIFrame" src="" width="100%" height="100%" style="height:70vh;" frameborder="0"></iframe>
+        <br/>
+        <br/>
+      </p>
+    </div>
+  </div>
+
+  <div id="viewHomeModal" class="modal">
+    <div class="modal-content" style="width:80%;height:89%;background-color:#172d39;">
+      <span id="viewClientDetailsCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:3px;color:white;">View Home</h2>
+      <p>
+        <iframe id="setupDateIFrame2" src="" width="100%" height="100%" style="height:70vh;" frameborder="0"></iframe>
+        <br/>
+        <br/>
+      </p>
+    </div>
+  </div>
+
+  <div id="endSessionModal" class="modal">
+    <div class="modal-content" style="background-color:#172d39;top:15vh;width:90%;">
+      <span id="endSessionCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <h2 style="margin-bottom:10px;color:white;">This will end the current session, continue?</h2>
+      <p>
+        <div class="options__button" id="yesEndSession" style="height:35px;width:215px;cursor:pointer;display:inline-block;text-align:center;margin-right:-4px;margin-top:10px;">
+          <i class="fa fa-exit">Yes, end the session</i>
+        </div>
+        <!--<div class="options__button" id="endSessionCloseButton2" style="width:85px;height:35px;cursor:pointer;background-color:#505050;display:inline-block;text-align:center;margin-top:10px;">
+          <i class="fa fa-cancel">Cancel</i>
+        </div>--><br/>
+      </p>
+    </div>
+  </div>
+
+  <div id="changeChatSettingsModal" class="modal" style="z-index:10;">
+    <div class="modal-content" style="background-color:#172d39;top:15vh;width:90%;">
+      <span id="changeChatSettingsCloseButton" class="close-btn" style="cursor:pointer;color:var(--main-light);">&times;</span>
+      <h2 style="margin-bottom:10px;color:var(--main-light);">Chat Options</h2>
+      
+      <label for="inputChatName" style="color:var(--main-light);">Set Displayname: </label>
+      <input type="text" id="inputChatName" name="inputChatName" style="width:50%;height:30px;">
+      <p id="inputChatNameDescriptor" style="font-size:12px;margin-top:1px;"></p>
+      <div class="options__button" id="changeChatSettingsButton" style="height:30px;width:100px;cursor:pointer;display:inline-block;text-align:center;margin-right:-4px;margin-top:20px;">
+        Submit
+      </div>
+    </div>
+  </div>
+
+  <div id="hippaComplianceModal" class="modal" style="display:block;">
+    <div class="modal-content" style="width:40%;background-color:#172d39;top:40px;">
+      <span id="hippaComplianceModalCloseButton" class="close-btn" style="cursor:pointer;color:white;">&times;</span>
+      <p>
+        <div id="hippaComplianceModalText" style="color:white;">Goldlink is HIPAA compliant and encrypted for your security. <br/><br/> Preparing session, please wait! <br/> </div>
+        <div style="text-align:center;">
+          <div class="options__button" id="hippaComplianceModalCloseButton2" style="height:35px;cursor:pointer;display:inline-block;text-align:center;margin-top:10px;">
+            <i class="fa fa-exit">Ok</i>
+          </div>
+        </div><br/>
+      </p>
+    </div>
+  </div>
+
+  <div id="noStreamDetectedModal" class="modal" style="display:none;">
+    <div class="modal-content" style="width:40%;background-color:#172d39;top:40px;">
+      <p>
+        <div id="noStreamDetectedModalText" style="color:white;">Setting up personal stream. <br/><br/> Please wait! <br/> </div>
+        <br/>
+      </p>
+    </div>
+  </div>
+
+  <div id="disconnectedNotificationModal" class="modal" style="display:none;">
+    <div class="modal-content" style="width:40%;background-color:#172d39;top:40px;">
+      <p>
+        <div id="disconnectedNotificationModalText" style="color:white;">You have been disconnected from the session. <br/><br/>  If you believe this is was an error, then you may try to reconnect. <br/> </div>
+        <br/>
+      </p>
+
+      <br/>
+      <div id='disconnectedNotificationModalButton' class='options__button' style='position: relative;width:64px;cursor:pointer;'> Ok</div>
+    </div>
+  </div>
+
+  <div class="disconnectioncircle" id="disconnectioncircle" style="display:none;position:absolute;bottom:4px;z-index:10;text-align:center;">
+    <i class="fa fa-signal" style="color:white;font-size:15px;"> Reconnecting or resetting session, please wait.. </i>
+  </div>
+
+  <div class="largescreen__options" style="display:none;">
+    <div id='endSessionButton2' class='options__button' style='position: relative;width:166px;cursor:pointer;top:-24px;padding-top:0.6rem;padding-bottom:0.7rem;'> <i class='fa fa-sign-out' style='margin-right: 5px;'></i>End Session</div>
+    <div id='shareScreenButton2' class='options__button' style='position: relative;width:166px;cursor:pointer;top:-24px;display:none;padding-top:1.25rem;padding-left:1.0rem'> <i class='fa fa-desktop' style='margin-right: 5px'></i>Share Screen</div>
+  </div>
+
+  </body>
+  <script type="module" src='rtc.js'></script>
+  <!--<script type="module" src='events.js'></script>
+  <script src='autolink.js'></script>
+  <script src="openplayerfix.min.js"></script>-->
+</html>
