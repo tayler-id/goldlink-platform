@@ -10,8 +10,12 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // Proxy API requests to backend server
+  // Proxy API requests to backend server (development only)
   async rewrites() {
+    // Only use rewrites in development, production uses environment variables
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
     return [
       {
         source: '/bmapi/:path*',
